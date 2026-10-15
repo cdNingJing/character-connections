@@ -1,6 +1,6 @@
 {
   "name": "character-connections",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Deterministic character relationship graphs with Journey to the West progressive examples",
   "type": "module",
   "license": "MIT",

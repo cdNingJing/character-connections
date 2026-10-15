@@ -171,6 +171,14 @@ const controlGroups: { title: string; open: boolean; fields: Control[] }[] = [
     title: '分组背景',
     open: true,
     fields: [
+      {
+        key: 'crossGroupRouting',
+        label: '跨组连线',
+        choices: [
+          ['curve', '自由曲线'],
+          ['channels', '沿组间通道'],
+        ],
+      },
       { key: 'showGroupBackground', label: '显示分组背景', type: 'checkbox' },
       { key: 'groupOpacity', label: '背景浓度', min: 0.03, max: 0.3, step: 0.01 },
       { key: 'groupPadding', label: '分组内边距', min: 24, max: 100, step: 2 },
@@ -218,6 +226,8 @@ element('appearance-controls').innerHTML = controlGroups
   )
   .join('');
 function syncAllControls(): void {
+  element<HTMLInputElement>('show-all-cross-relations').checked =
+    appearance.crossGroupVisibility === 'all';
   for (const field of document.querySelectorAll<HTMLInputElement | HTMLSelectElement>(
     '[data-option]',
   )) {
@@ -309,14 +319,16 @@ element('appearance-controls').addEventListener('input', (event) => {
 element('example-stage').addEventListener('change', () => {
   data = createJourneyDocument(Number(element<HTMLSelectElement>('example-stage').value));
   chart.update({ data, appearance, layout: example.id });
-  chart.graph.selectCharacterById(data.coreId!);
+  if (example.id === 'groups') chart.graph.clearSelection();
+  else chart.graph.selectCharacterById(data.coreId!);
   refreshDataSummary();
   syncAllSourcePanels();
 });
 element('example-core').addEventListener('change', () => {
   data = { ...data, coreId: element<HTMLSelectElement>('example-core').value };
   chart.update({ data, appearance, layout: example.id });
-  chart.graph.selectCharacterById(data.coreId!);
+  if (example.id === 'groups') chart.graph.clearSelection();
+  else chart.graph.selectCharacterById(data.coreId!);
   syncAllSourcePanels();
 });
 window.addEventListener('hashchange', loadExampleByHash);
@@ -404,8 +416,8 @@ element('close-guide').addEventListener('click', () =>
   element<HTMLDialogElement>('integration-guide').close(),
 );
 element<HTMLAnchorElement>('download-package').href = import.meta.env.DEV
-  ? './dist/character-connections-0.6.0.tgz'
-  : './character-connections-0.6.0.tgz';
+  ? './dist/character-connections-0.7.0.tgz'
+  : './character-connections-0.7.0.tgz';
 selectSourceTab('code');
 loadExampleByHash();
 window.addEventListener('pagehide', (event) => {
@@ -428,3 +440,15 @@ setParametersCollapsed(window.matchMedia('(max-width:700px)').matches);
 
 element('zoom-in-example').addEventListener('click', () => chart.graph.zoomBy(1.4));
 element('zoom-out-example').addEventListener('click', () => chart.graph.zoomBy(1 / 1.4));
+
+element('show-all-cross-relations').addEventListener('change', () => {
+  appearance = parseGraphOptions({
+    ...appearance,
+    crossGroupVisibility: element<HTMLInputElement>('show-all-cross-relations').checked
+      ? 'all'
+      : 'selected',
+  });
+  chart.update({ appearance });
+  syncAllControls();
+  syncAllSourcePanels(false);
+});

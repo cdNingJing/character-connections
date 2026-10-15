@@ -110,3 +110,11 @@
 `appearance.showGroupBackground` 打开独立背景区；`groupOpacity` 为 0.03–0.3，`groupPadding` 为 24–100，`groupBorder` 为 solid 或 dashed。分组背景跟随缩放、平移、人物拖动和章节过滤，不创建额外人物、不改变选中状态。推荐搭配 groups 布局；其他布局中分组范围可能交叠。
 
 `nodeContent: identity` 显示姓名和身份：优先读取 attributes.身份、attributes.职责，其次为不重复的别名。完整资料仍保存在原始数据中。
+
+## 跨组通道与按人物展开
+
+`appearance.crossGroupVisibility` 为 `selected` 时，默认只显示组内关系；选中人物后额外显示与此人物直接相连的跨组关系。选中单条关系时保留该关系，取消选中后收起跨组关系。设置为 `all` 显示全部关系。人物、位置、分组范围与原始关系数据不受影响；章节过滤始终优先。
+
+`appearance.crossGroupRouting: channels` 使用正交通道与圆角转弯：先从卡片绕开组内其他卡片到达组边，再沿组间空白区域走向目标分组。推荐配合 groups 布局。通道可能共用部分路径，不保证任意图无交叉；手动把分组拖到重叠或阻塞位置、无法找到通道时保留原曲线路径。`curve` 沿用原连线设置。
+
+分组示例默认 selected + channels；其他示例保持原设置。示例站和工作台的“显示全部关系”开关控制 crossGroupVisibility，调用代码和导出 JSON 同步保留。

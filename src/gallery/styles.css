@@ -683,3 +683,16 @@ dialog li {
     padding: 5px 6px;
   }
 }
+
+.cross-group-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
+  color: var(--muted);
+}
+.cross-group-toggle input {
+  accent-color: var(--accent);
+}

@@ -76,6 +76,8 @@ export interface GraphOptions {
   nodeShape: 'ellipse' | 'round-rectangle' | 'diamond' | 'hexagon';
   nodeSize: number;
   nodeContent: 'name' | 'group' | 'description' | 'identity';
+  crossGroupVisibility: 'all' | 'selected';
+  crossGroupRouting: 'curve' | 'channels';
   showGroupBackground: boolean;
   groupOpacity: number;
   groupPadding: number;
@@ -110,6 +112,8 @@ export const DEFAULT_OPTIONS: GraphOptions = {
   nodeShape: 'round-rectangle',
   nodeSize: 56,
   nodeContent: 'name',
+  crossGroupVisibility: 'all',
+  crossGroupRouting: 'curve',
   showGroupBackground: false,
   groupOpacity: 0.09,
   groupPadding: 42,
@@ -166,6 +170,8 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     nodeShape: ['ellipse', 'round-rectangle', 'diamond', 'hexagon'],
     nodeContent: ['name', 'group', 'description', 'identity'],
     groupBorder: ['solid', 'dashed'],
+    crossGroupVisibility: ['all', 'selected'],
+    crossGroupRouting: ['curve', 'channels'],
     pattern: ['dots', 'grid', 'none'],
     edgeShape: [
       'bezier',

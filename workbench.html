@@ -52,15 +52,7 @@
               autocomplete="off"
           /></label>
           <div class="toolbar-actions">
-            <button id="clear-selection" class="secondary">显示全部关系</button
-            ><button
-              id="open-settings"
-              class="secondary mobile-only"
-              aria-expanded="false"
-              aria-controls="settings-panel"
-            >
-              图谱设置
-            </button>
+            <button id="clear-selection" class="secondary">取消选中</button>
           </div>
         </div>
         <div class="search-results" id="search-results" aria-label="人物搜索结果" hidden></div>
@@ -185,6 +177,14 @@
         </details>
         <details class="setting-section" open>
           <summary>分组背景</summary>
+          <label class="check-field"
+            ><input id="show-all-cross-relations-workbench" type="checkbox" />显示全部关系</label
+          ><label class="field"
+            >跨组连线<select id="cross-group-routing">
+              <option value="curve">自由曲线</option>
+              <option value="channels">沿组间通道</option>
+            </select></label
+          >
           <div class="setting-content">
             <label class="check-field"
               ><input id="show-group-background" type="checkbox" />显示分组背景</label

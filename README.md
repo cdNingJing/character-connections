@@ -99,10 +99,10 @@ npm run preview
 
 ## 接入自己的项目
 
-当前提供可安装的 `.tgz` 包，尚未发布到 npm registry。`npm run build` 同时生成示例站、类型声明、库和 `dist/character-connections-0.6.0.tgz`。
+当前提供可安装的 `.tgz` 包，尚未发布到 npm registry。`npm run build` 同时生成示例站、类型声明、库和 `dist/character-connections-0.7.0.tgz`。
 
 ```bash
-npm install ./character-connections-0.6.0.tgz
+npm install ./character-connections-0.7.0.tgz
 ```
 
 ```typescript
@@ -163,3 +163,7 @@ npm run build
 ### v0.6 独立分组背景
 
 新增随画布移动和缩放的分组背景区，支持每组名称、颜色、说明与全局透明度、间距、边框配置。分组示例采用浅色卡片网格，分组名独立显示；选择人物不改变背景或其他人物的位置。背景元数据随 JSON 导入导出，也同步出现在组件调用代码中。
+
+### v0.7 跨组通道与局部展开
+
+分组示例默认只显示组内关系。点击人物展开他的跨组关系，其他人物和分组保持原位；取消选中即可收起。跨组连线采用组边出口和组间通道，“显示全部关系”开关可查看完整图谱。参数同步到组件调用代码与 JSON。

@@ -5,7 +5,7 @@
 先下载示例站中的 `.tgz` 包，或在源码运行 `npm run build`，再在自己的项目安装该文件。当前未发布 npm registry。`cytoscape` 会作为运行依赖安装，Vue、React 不属于依赖。
 
 ```bash
-npm install ./character-connections-0.6.0.tgz
+npm install ./character-connections-0.7.0.tgz
 ```
 
 始终导入 `character-connections/style.css`。样式仅作用于图谱容器与自定义元素，不包含示例站、工作台或全局页面样式。给容器设置明确高度，组件通过 ResizeObserver 响应尺寸变化。

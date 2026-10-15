@@ -1,4 +1,5 @@
 import cytoscape from 'cytoscape';
+import { getAllCrossGroupChannelRoutes, shouldDisplayCrossGroupRelation } from './group-channels';
 import { getAllGroupRegions } from './group-regions';
 import { getAllNonOverlappingLabelPositions, getPointAlongPolyline } from './edge-labels';
 import { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';
@@ -190,9 +191,36 @@ export class CharacterGraph {
       this.options.edgeCurvature * strength,
       radius,
     );
+    const nodes = this.core
+      .nodes()
+      .not('.unrevealed')
+      .map((item) => {
+        const node = item as NodeSingular;
+        return {
+          id: node.id(),
+          group: String(node.data('group')),
+          ...node.position(),
+          width: node.width(),
+          height: node.height() + 24,
+        };
+      });
+    const regions = getAllGroupRegions(
+      this.document,
+      nodes,
+      this.options.groupPadding,
+      GROUP_COLORS,
+    );
+    const channels =
+      this.options.crossGroupRouting === 'channels'
+        ? getAllCrossGroupChannelRoutes(this.document, nodes, regions)
+        : new Map();
     this.core.batch(() => {
       this.core.edges().forEach((edge) => {
         const route = routes.get(edge.id())!;
+        const channel = channels.get(edge.id());
+        edge.data('channelRoute', !!channel);
+        edge.data('channelDistances', channel?.distances.join(' ') ?? '0');
+        edge.data('channelWeights', channel?.weights.join(' ') ?? '0.5');
         edge.data('routeDistance', route.distance);
         edge.data('routeDistances', route.distances.join(' '));
         edge.data('routeWeights', route.weights.join(' '));
@@ -204,7 +232,6 @@ export class CharacterGraph {
   applyAppearanceOptions(options: Partial<GraphOptions> = {}): void {
     this.options = parseGraphOptions({ ...this.options, ...options });
     const settings = this.options;
-    this.updateAllCurveRoutes();
     this.host.style.backgroundColor = settings.background;
     this.host.dataset.pattern = settings.pattern;
     this.host.style.setProperty(
@@ -328,6 +355,15 @@ export class CharacterGraph {
         selector: 'edge[?directed]',
         css: { 'target-arrow-shape': settings.arrows ? 'triangle' : 'none' },
       },
+      {
+        selector: 'edge[?channelRoute]',
+        css: {
+          'curve-style': 'round-segments',
+          'segment-distances': 'data(channelDistances)',
+          'segment-weights': 'data(channelWeights)',
+          'segment-radii': [10],
+        },
+      },
       { selector: 'edge.cross-branch', css: { opacity: 0.2, 'line-style': 'dotted' } },
       { selector: '.dimmed', css: { opacity: 0.13, label: '' } },
       {
@@ -401,11 +437,13 @@ export class CharacterGraph {
           'min-zoomed-font-size': 0,
         },
       },
+      { selector: 'edge.cross-group-hidden', css: { display: 'none' } },
       { selector: '.unrevealed', css: { display: 'none' } },
       { selector: 'edge.layout-moving', css: { display: 'none' } },
       { selector: '.entering', css: { opacity: 0 } },
     ];
     this.core.style(styles);
+    this.updateAllCurveRoutes();
     this.updateSelectionStyles();
     this.updateAllGroupBackgrounds();
   }
@@ -417,6 +455,7 @@ export class CharacterGraph {
       .edges()
       .filter(
         (edge) =>
+          !edge.hasClass('cross-group-hidden') &&
           !edge.hasClass('unrevealed') &&
           !edge.hasClass('layout-moving') &&
           (settings.labels === 'all' ||
@@ -450,7 +489,8 @@ export class CharacterGraph {
         edge.source().id() === coreId ? 0.68 : edge.target().id() === coreId ? 0.32 : 0.5;
       const ratios =
         settings.labelPosition === 'auto' ? [preferred, 0.5, 0.35, 0.65, 0.25, 0.75] : [base];
-      const curved = ['bezier', 'soft-bezier', 'arc'].includes(settings.edgeShape);
+      const curved =
+        !edge.data('channelRoute') && ['bezier', 'soft-bezier', 'arc'].includes(settings.edgeShape);
       const points = curved
         ? sampleCurveRoute(
             a,
@@ -495,7 +535,12 @@ export class CharacterGraph {
     );
     this.core.batch(() =>
       this.core.edges().forEach((edge) => {
-        if (edge.hasClass('layout-moving') || edge.hasClass('unrevealed')) return;
+        if (
+          edge.hasClass('cross-group-hidden') ||
+          edge.hasClass('layout-moving') ||
+          edge.hasClass('unrevealed')
+        )
+          return;
         const middle = edge.midpoint() ?? { x: 0, y: 0 },
           point = placements.get(edge.id());
         edge.data('labelOffsetX', point ? point.x - middle.x : 0);
@@ -633,6 +678,7 @@ export class CharacterGraph {
         edge.toggleClass('unrevealed', !relations.has(edge.id()));
       });
     });
+    this.updateAllCurveRoutes();
     if (this.selection && !characters.has(this.selection.id) && !relations.has(this.selection.id)) {
       this.clearSelection();
     } else this.updateSelectionStyles();
@@ -662,6 +708,18 @@ export class CharacterGraph {
 
   private updateSelectionStyles(): void {
     this.core.batch(() => {
+      this.core.edges().forEach((edge) => {
+        const cross = edge.source().data('group') !== edge.target().data('group');
+        edge.toggleClass(
+          'cross-group-hidden',
+          cross &&
+            !shouldDisplayCrossGroupRelation(
+              this.options.crossGroupVisibility,
+              { id: edge.id(), source: edge.source().id(), target: edge.target().id() },
+              this.selection,
+            ),
+        );
+      });
       this.core.elements().removeClass('dimmed focused related neighbor');
       if (!this.selection) return;
       const element = this.core.getElementById(this.selection.id);

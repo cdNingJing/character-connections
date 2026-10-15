@@ -164,6 +164,7 @@ function renderCharacterSearchResults(): void {
 }
 
 const optionFields: Record<string, keyof GraphOptions> = {
+  'cross-group-routing': 'crossGroupRouting',
   'show-group-background': 'showGroupBackground',
   'group-opacity': 'groupOpacity',
   'group-padding': 'groupPadding',
@@ -197,6 +198,8 @@ const optionFields: Record<string, keyof GraphOptions> = {
 };
 
 function syncOptionFields(): void {
+  $<HTMLInputElement>('show-all-cross-relations-workbench').checked =
+    graph.options.crossGroupVisibility === 'all';
   for (const [id, key] of Object.entries(optionFields)) {
     const field = $<HTMLInputElement | HTMLSelectElement>(id);
     if (field instanceof HTMLInputElement && field.type === 'checkbox')
@@ -476,4 +479,13 @@ requestAnimationFrame(() => graph.fit());
 graph.core.on('zoom', () => {
   $('canvas-status').textContent =
     graph.core.zoom() < 0.45 ? '放大查看人物和关系文字' : '拖动人物调整位置';
+});
+
+$('show-all-cross-relations-workbench').addEventListener('change', () => {
+  graph.applyAppearanceOptions({
+    crossGroupVisibility: $<HTMLInputElement>('show-all-cross-relations-workbench').checked
+      ? 'all'
+      : 'selected',
+  });
+  saveCurrentProject();
 });

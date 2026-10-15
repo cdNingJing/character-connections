@@ -297,6 +297,12 @@
         },
         "groupBorder": {
           "enum": ["solid", "dashed"]
+        },
+        "crossGroupVisibility": {
+          "enum": ["all", "selected"]
+        },
+        "crossGroupRouting": {
+          "enum": ["curve", "channels"]
         }
       }
     },

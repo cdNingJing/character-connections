@@ -31,7 +31,7 @@
         <p class="sidebar-label">按布局查看示例</p>
         <nav id="layout-navigation" aria-label="示例布局"></nav>
         <div class="package-note">
-          <span class="package-version">v0.6.0 · MIT</span>
+          <span class="package-version">v0.7.0 · MIT</span>
           <p>同一套数据，多种排列方式。调整参数后直接复制代码。</p>
           <a id="download-package" download>下载组件包 .tgz</a>
         </div>
@@ -51,12 +51,12 @@
             <div class="preview-heading">
               <span id="example-count"></span>
               <div>
-                <button id="clear-selection">显示全部关系</button
-                ><button id="zoom-in-example" aria-label="放大图谱">＋</button
-                ><button id="zoom-out-example" aria-label="缩小图谱">−</button
-                ><button id="fit-example">适应画布</button>
+                <button id="clear-selection">取消选中</button>
               </div>
             </div>
+            <label class="cross-group-toggle"
+              ><input id="show-all-cross-relations" type="checkbox" />显示全部关系</label
+            >
             <div id="example-graph" role="img" aria-label="人物关系图"></div>
             <div id="selection-detail" class="selection-detail" aria-live="polite"></div>
           </section>
@@ -127,7 +127,7 @@
       <ol>
         <li>
           <a id="download-package-guide" download>下载组件包</a>，在自己的项目中安装：
-          <pre><code>npm install ./character-connections-0.6.0.tgz</code></pre>
+          <pre><code>npm install ./character-connections-0.7.0.tgz</code></pre>
         </li>
         <li>选择布局和参数，下载“示例数据”，保存为 <code>graph-data.json</code>。</li>
         <li>在“调用代码”中选择 TypeScript、HTML 自定义元素、React 或 Vue 3，复制代码。</li>
