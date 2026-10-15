@@ -234,7 +234,7 @@
           "maximum": 96
         },
         "nodeContent": {
-          "enum": ["name", "group", "description"]
+          "enum": ["name", "group", "description", "identity"]
         },
         "showAliases": {
           "type": "boolean"
@@ -281,6 +281,22 @@
         },
         "avoidLabelOverlap": {
           "type": "boolean"
+        },
+        "showGroupBackground": {
+          "type": "boolean"
+        },
+        "groupOpacity": {
+          "type": "number",
+          "minimum": 0.03,
+          "maximum": 0.3
+        },
+        "groupPadding": {
+          "type": "number",
+          "minimum": 24,
+          "maximum": 100
+        },
+        "groupBorder": {
+          "enum": ["solid", "dashed"]
         }
       }
     },
@@ -288,6 +304,35 @@
       "type": "string",
       "minLength": 1,
       "maxLength": 100
+    },
+    "groups": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        }
+      }
     }
   }
 }

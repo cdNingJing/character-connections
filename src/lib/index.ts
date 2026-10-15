@@ -24,3 +24,6 @@ export { createCharacterGraph, CharacterGraphComponent } from './component';
 export type { CharacterGraphProps } from './component';
 
 export { LAYOUT_NAMES } from './model';
+
+export type { CharacterGroup } from './model';
+export { getAllGroupRegions } from './group-regions';

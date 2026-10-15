@@ -102,3 +102,11 @@
 `labelFontSize` 为 10–20，`labelMaxWidth` 为 60–240，`labelOffset` 为 -30–30，单位为画布坐标 px。选中的关系在缩小时保持最低可读字号。`labelBackground` 为 `pill` / `plain` / `none`；`labelDirection` 为 `horizontal` / `along-edge`；`labelPosition` 为 `auto` / `middle` / `source` / `target`。`labels: focused` 只显示选中的单条关系。
 
 `avoidLabelOverlap` 默认开启，以确定性候选位置尽量避开人物和其他可见文字；密集图无法保证没有重叠，沿线旋转后的碰撞判断采用近似边界。自动避让可能使文字稍微偏离指定位置；精确放置时可关闭。所有设置均包含在导出 JSON 的 `appearance` 中，旧 JSON 自动补齐默认设置。
+
+## 分组背景
+
+`characters[].group` 保持原有的字符串分组。文档可添加 `groups` 数组：`{ name: "取经团队", label: "西天取经团队", color: "#377e70", description: "师徒同行，西天取经" }`。`name` 对应人物的 group，必须唯一；未填写元数据时使用分组名称和默认颜色。没有当前可见人物的分组不显示。
+
+`appearance.showGroupBackground` 打开独立背景区；`groupOpacity` 为 0.03–0.3，`groupPadding` 为 24–100，`groupBorder` 为 solid 或 dashed。分组背景跟随缩放、平移、人物拖动和章节过滤，不创建额外人物、不改变选中状态。推荐搭配 groups 布局；其他布局中分组范围可能交叠。
+
+`nodeContent: identity` 显示姓名和身份：优先读取 attributes.身份、attributes.职责，其次为不重复的别名。完整资料仍保存在原始数据中。

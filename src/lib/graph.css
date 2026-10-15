@@ -37,3 +37,14 @@ character-connections {
   display: block;
   min-height: 320px;
 }
+
+[data-character-graph] > svg[data-group-layer] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  font-family: 'Microsoft YaHei', sans-serif;
+}

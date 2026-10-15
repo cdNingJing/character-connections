@@ -254,6 +254,12 @@ export function createJourneyDocument(stage = 0): GraphDocument {
     title: '西游记人物关系',
     maxChapter: 1,
     coreId: 'wukong',
+    groups: [
+      { name: '取经团队', color: '#377e70', description: '师徒同行，西天取经' },
+      { name: '神佛与仙人', color: '#527aa2', description: '师承、安排取经与解难' },
+      { name: '天庭与龙宫', color: '#ad8042', description: '天庭与龙宫的相关人物' },
+      { name: '妖怪与相关人物', color: '#b56f70', description: '取经途中遇到的人物与家属' },
+    ],
     characters,
     relations,
   };

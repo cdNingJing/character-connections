@@ -22,7 +22,7 @@ const escapeHtml = (value: string) =>
     /[&<>"']/g,
     (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]!,
   );
-let example = LAYOUT_EXAMPLES[0];
+let example = LAYOUT_EXAMPLES.find((item) => item.id === 'groups')!;
 let data: GraphDocument = createJourneyDocument(example.stage);
 let appearance: GraphOptions = parseGraphOptions({ ...DEFAULT_OPTIONS, ...example.appearance });
 let chart: CharacterGraphComponent;
@@ -79,6 +79,7 @@ const controlGroups: { title: string; open: boolean; fields: Control[] }[] = [
           ['name', '姓名'],
           ['group', '姓名与分组'],
           ['description', '姓名与简介'],
+          ['identity', '姓名与身份'],
         ],
       },
       { key: 'nodeSize', label: '人物大小', min: 32, max: 96, step: 4 },
@@ -167,6 +168,23 @@ const controlGroups: { title: string; open: boolean; fields: Control[] }[] = [
     ],
   },
   {
+    title: '分组背景',
+    open: true,
+    fields: [
+      { key: 'showGroupBackground', label: '显示分组背景', type: 'checkbox' },
+      { key: 'groupOpacity', label: '背景浓度', min: 0.03, max: 0.3, step: 0.01 },
+      { key: 'groupPadding', label: '分组内边距', min: 24, max: 100, step: 2 },
+      {
+        key: 'groupBorder',
+        label: '分组边框',
+        choices: [
+          ['solid', '实线'],
+          ['dashed', '虚线'],
+        ],
+      },
+    ],
+  },
+  {
     title: '背景与切换效果',
     open: false,
     fields: [
@@ -248,7 +266,9 @@ function refreshDataSummary(): void {
 }
 function loadExampleByHash(): void {
   const id = location.hash.slice(1);
-  example = LAYOUT_EXAMPLES.find((item) => item.id === id) ?? LAYOUT_EXAMPLES[0];
+  example =
+    LAYOUT_EXAMPLES.find((item) => item.id === id) ??
+    LAYOUT_EXAMPLES.find((item) => item.id === 'groups')!;
   data = createJourneyDocument(example.stage);
   appearance = parseGraphOptions({ ...DEFAULT_OPTIONS, ...example.appearance });
   element('example-title').textContent = example.title;
@@ -266,7 +286,8 @@ function loadExampleByHash(): void {
       layout: example.id,
       onSelectionChange: renderSelection,
     });
-  chart.graph.selectCharacterById(data.coreId ?? data.characters[0].id);
+  if (example.id === 'groups') chart.graph.clearSelection();
+  else chart.graph.selectCharacterById(data.coreId ?? data.characters[0].id);
   refreshDataSummary();
   syncAllControls();
   syncAllSourcePanels();
@@ -383,8 +404,8 @@ element('close-guide').addEventListener('click', () =>
   element<HTMLDialogElement>('integration-guide').close(),
 );
 element<HTMLAnchorElement>('download-package').href = import.meta.env.DEV
-  ? './dist/character-connections-0.5.0.tgz'
-  : './character-connections-0.5.0.tgz';
+  ? './dist/character-connections-0.6.0.tgz'
+  : './character-connections-0.6.0.tgz';
 selectSourceTab('code');
 loadExampleByHash();
 window.addEventListener('pagehide', (event) => {

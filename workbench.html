@@ -170,6 +170,7 @@
                 <option value="name">只显示姓名</option>
                 <option value="group">姓名与分组</option>
                 <option value="description">姓名与简介摘要</option>
+                <option value="identity">姓名与身份</option>
               </select></label
             >
             <p class="field-help">完整资料在右侧查看。以下开关控制详情内容。</p>
@@ -180,6 +181,29 @@
             <label class="check-field"
               ><input id="show-description" type="checkbox" />显示人物简介</label
             >
+          </div>
+        </details>
+        <details class="setting-section" open>
+          <summary>分组背景</summary>
+          <div class="setting-content">
+            <label class="check-field"
+              ><input id="show-group-background" type="checkbox" />显示分组背景</label
+            >
+            <label class="field"
+              >背景浓度<input id="group-opacity" type="range" min="0.03" max="0.3" step="0.01"
+            /></label>
+            <label class="field"
+              >分组内边距<input id="group-padding" type="range" min="24" max="100" step="2"
+            /></label>
+            <label class="field"
+              >分组边框<select id="group-border">
+                <option value="solid">实线</option>
+                <option value="dashed">虚线</option>
+              </select></label
+            >
+            <p class="field-help">
+              建议搭配按分组排列。分组名称、颜色和说明可在 JSON 的 groups 中设置。
+            </p>
           </div>
         </details>
         <details class="setting-section">

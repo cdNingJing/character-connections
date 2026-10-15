@@ -164,6 +164,10 @@ function renderCharacterSearchResults(): void {
 }
 
 const optionFields: Record<string, keyof GraphOptions> = {
+  'show-group-background': 'showGroupBackground',
+  'group-opacity': 'groupOpacity',
+  'group-padding': 'groupPadding',
+  'group-border': 'groupBorder',
   'node-shape': 'nodeShape',
   'node-size': 'nodeSize',
   'node-content': 'nodeContent',
@@ -239,6 +243,8 @@ for (const [id, key] of Object.entries(optionFields)) {
         field instanceof HTMLInputElement && field.type === 'checkbox'
           ? field.checked
           : [
+                'groupOpacity',
+                'groupPadding',
                 'edgeWidth',
                 'duration',
                 'nodeSize',

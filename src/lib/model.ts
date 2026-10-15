@@ -34,7 +34,14 @@ export interface Relation {
   toChapter?: number;
 }
 
+export interface CharacterGroup {
+  name: string;
+  label?: string;
+  color?: string;
+  description?: string;
+}
 export interface GraphDocument {
+  groups?: CharacterGroup[];
   schemaVersion: 1;
   title: string;
   maxChapter: number;
@@ -68,7 +75,11 @@ export type TransitionName = 'none' | 'smooth' | 'fade';
 export interface GraphOptions {
   nodeShape: 'ellipse' | 'round-rectangle' | 'diamond' | 'hexagon';
   nodeSize: number;
-  nodeContent: 'name' | 'group' | 'description';
+  nodeContent: 'name' | 'group' | 'description' | 'identity';
+  showGroupBackground: boolean;
+  groupOpacity: number;
+  groupPadding: number;
+  groupBorder: 'solid' | 'dashed';
   showAliases: boolean;
   showAttributes: boolean;
   showDescription: boolean;
@@ -99,6 +110,10 @@ export const DEFAULT_OPTIONS: GraphOptions = {
   nodeShape: 'round-rectangle',
   nodeSize: 56,
   nodeContent: 'name',
+  showGroupBackground: false,
+  groupOpacity: 0.09,
+  groupPadding: 42,
+  groupBorder: 'solid',
   showAliases: true,
   showAttributes: true,
   showDescription: true,
@@ -149,7 +164,8 @@ export function parseGraphOptions(input: unknown): GraphOptions {
   }
   const choices = {
     nodeShape: ['ellipse', 'round-rectangle', 'diamond', 'hexagon'],
-    nodeContent: ['name', 'group', 'description'],
+    nodeContent: ['name', 'group', 'description', 'identity'],
+    groupBorder: ['solid', 'dashed'],
     pattern: ['dots', 'grid', 'none'],
     edgeShape: [
       'bezier',
@@ -179,6 +195,7 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     'unifiedEdgeColor',
     'arrows',
     'avoidLabelOverlap',
+    'showGroupBackground',
     'showAliases',
     'showAttributes',
     'showDescription',
@@ -188,6 +205,8 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     result[key] = input[key];
   }
   const numberRanges = {
+    groupOpacity: [0.03, 0.3],
+    groupPadding: [24, 100],
     edgeWidth: [1, 5],
     duration: [0, 2000],
     nodeSize: [32, 96],
@@ -337,6 +356,7 @@ export function parseGraphDocument(input: unknown): GraphDocument {
   });
   return {
     schemaVersion: 1,
+    groups: parseAllCharacterGroups(input.groups),
     title,
     maxChapter,
     characters,
@@ -379,29 +399,66 @@ export function getAllActiveRelationsByChapter(
 export function getAllGroupPositions(
   document: GraphDocument,
 ): Map<string, { x: number; y: number }> {
-  const groups = [...new Set(document.characters.map((person) => person.group))];
+  const groups = [...new Set(document.characters.map((person) => person.group))].sort();
+  const coreId = document.coreId ?? document.characters[0].id;
+  const coreGroup = document.characters.find((person) => person.id === coreId)!.group;
+  groups.sort((a, b) => (a === coreGroup ? -1 : b === coreGroup ? 1 : a.localeCompare(b)));
   const positions = new Map<string, { x: number; y: number }>();
-  const columns = Math.ceil(Math.sqrt(groups.length));
-  const largestRadius = Math.max(
-    ...groups.map((group) =>
-      Math.max(85, document.characters.filter((person) => person.group === group).length * 18),
-    ),
+  const groupColumns = Math.ceil(Math.sqrt(groups.length));
+  const dimensions = groups.map((group) => {
+    const count = document.characters.filter((person) => person.group === group).length;
+    const columns = Math.min(3, Math.ceil(Math.sqrt(count)));
+    return {
+      columns,
+      rows: Math.ceil(count / columns),
+      width: columns * 210,
+      height: Math.ceil(count / columns) * 140,
+    };
+  });
+  const columnWidths = Array.from(
+    { length: groupColumns },
+    (_, column) =>
+      Math.max(
+        ...dimensions
+          .filter((_, index) => index % groupColumns === column)
+          .map((item) => item.width),
+      ) + 220,
   );
-  const spacing = Math.max(330, largestRadius * 2 + 220);
-  groups.forEach((group, groupIndex) => {
-    const members = document.characters.filter((person) => person.group === group);
-    const radius = Math.max(85, members.length * 18);
-    members.forEach((person, index) => {
-      const angle = -Math.PI / 2 + (index * Math.PI * 2) / members.length;
+  const rowHeights = Array.from(
+    { length: Math.ceil(groups.length / groupColumns) },
+    (_, row) =>
+      Math.max(
+        ...dimensions
+          .slice(row * groupColumns, (row + 1) * groupColumns)
+          .map((item) => item.height),
+      ) + 280,
+  );
+  groups.forEach((group, index) => {
+    const members = document.characters
+      .filter((person) => person.group === group)
+      .sort((a, b) => (a.id === coreId ? -1 : b.id === coreId ? 1 : a.id < b.id ? -1 : 1));
+    const { columns, rows } = dimensions[index];
+    const originX = columnWidths
+      .slice(0, index % groupColumns)
+      .reduce((sum, value) => sum + value, 0);
+    const originY = rowHeights
+      .slice(0, Math.floor(index / groupColumns))
+      .reduce((sum, value) => sum + value, 0);
+    members.forEach((person, memberIndex) =>
       positions.set(
         person.id,
         person.position ?? {
-          x: (groupIndex % columns) * spacing + Math.cos(angle) * radius,
-          y: Math.floor(groupIndex / columns) * spacing + Math.sin(angle) * radius,
+          x: originX + (memberIndex % columns) * 210,
+          y: originY + Math.floor(memberIndex / columns) * 140,
         },
-      );
-    });
+      ),
+    );
   });
+  if (!document.characters.some((person) => person.position)) {
+    const center = positions.get(coreId)!;
+    for (const [id, point] of positions)
+      positions.set(id, { x: point.x - center.x, y: point.y - center.y });
+  }
   return positions;
 }
 
@@ -421,4 +478,28 @@ function parseAttributes(value: unknown): Record<string, string> | undefined {
       requireText(item, '属性值', 500),
     ]),
   );
+}
+
+function parseAllCharacterGroups(value: unknown): CharacterGroup[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > 500)
+    throw new Error('groups 必须是最多 500 项的数组');
+  const names = new Set<string>();
+  return value.map((raw) => {
+    if (!isRecord(raw)) throw new Error('分组必须是对象');
+    const name = requireText(raw.name, '分组 name', 80);
+    if (names.has(name)) throw new Error(`分组名称重复：${name}`);
+    names.add(name);
+    if (
+      raw.color !== undefined &&
+      (typeof raw.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(raw.color))
+    )
+      throw new Error('分组 color 必须是六位十六进制颜色');
+    return {
+      name,
+      label: raw.label === undefined ? undefined : requireText(raw.label, '分组 label', 80),
+      color: raw.color as string | undefined,
+      description: optionalText(raw.description, '分组 description'),
+    };
+  });
 }

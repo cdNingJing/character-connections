@@ -23,8 +23,16 @@ export const LAYOUT_EXAMPLES: LayoutExample[] = [
     title: '分组关系图',
     group: '关系布局',
     description: '按人物分组形成多个小群体，适合比较团队、家族和阵营之间的联系。',
-    rule: '人物按 group 聚合，分组之间的关系仍然保留。',
-    appearance: { edgeShape: 'soft-bezier' },
+    rule: '人物按 group 排进独立背景区，组名、颜色和说明可在数据的 groups 中设置。跨组关系仍然保留，点击连线查看说明。',
+    appearance: {
+      edgeShape: 'soft-bezier',
+      background: '#fcfcfa',
+      pattern: 'none',
+      showGroupBackground: true,
+      nodeContent: 'name',
+      nodeSize: 72,
+      labels: 'focused',
+    },
     stage: 3,
   },
   {

@@ -1,4 +1,5 @@
 import cytoscape from 'cytoscape';
+import { getAllGroupRegions } from './group-regions';
 import { getAllNonOverlappingLabelPositions, getPointAlongPolyline } from './edge-labels';
 import { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';
 import './graph.css';
@@ -39,6 +40,9 @@ export class CharacterGraph {
   private host: HTMLElement;
   private onSelection: (selection: Selection) => void;
   private resizeObserver: ResizeObserver;
+  private groupLayer: SVGSVGElement;
+  private groupFrame?: number;
+  private layoutName: LayoutName = 'semantic';
   private pendingFit: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
@@ -63,6 +67,11 @@ export class CharacterGraph {
       layout: { name: 'preset' },
       style: [],
     });
+    this.groupLayer = globalThis.document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.groupLayer.setAttribute('data-group-layer', '');
+    this.groupLayer.setAttribute('aria-hidden', 'true');
+    this.host.append(this.groupLayer);
+    this.core.on('pan zoom resize position', () => this.scheduleAllGroupBackgroundUpdates());
     this.core.on('tap', 'node', (event) => this.selectCharacterById(event.target.id()));
     this.core.on('tap', 'edge', (event) => this.selectRelationById(event.target.id()));
     this.core.on('tap', (event) => {
@@ -128,7 +137,9 @@ export class CharacterGraph {
         data: {
           ...person,
           isCore: person.id === findCoreCharacterId(parsed),
-          color: GROUP_COLORS[groups.indexOf(person.group) % GROUP_COLORS.length],
+          color:
+            parsed.groups?.find((group) => group.name === person.group)?.color ??
+            GROUP_COLORS[groups.indexOf(person.group) % GROUP_COLORS.length],
         },
         position: positions.get(person.id),
       })),
@@ -223,16 +234,17 @@ export class CharacterGraph {
           'border-color': 'data(color)',
           'border-width': 2,
           color: textColor,
-          'font-size': 15,
+          'font-size': (node: NodeSingular) =>
+            settings.showGroupBackground ? Math.max(15, 10 / node.cy().zoom()) : 15,
           'font-family': 'Microsoft YaHei, sans-serif',
           'text-valign': settings.nodeShape === 'round-rectangle' ? 'center' : 'bottom',
           'text-margin-y': settings.nodeShape === 'round-rectangle' ? 0 : 10,
           'text-wrap': 'wrap',
-          'text-max-width': '160px',
+          'text-max-width': `${settings.nodeShape === 'round-rectangle' ? settings.nodeSize * 1.9 - 16 : 160}px`,
           'text-background-color': settings.background,
           'text-background-opacity': 0.9,
           'text-background-padding': '3px',
-          'min-zoomed-font-size': 9,
+          'min-zoomed-font-size': settings.showGroupBackground ? 0 : 9,
           'overlay-padding': '7px',
           'transition-property': 'opacity, background-color, border-width',
           'transition-duration': duration,
@@ -241,6 +253,11 @@ export class CharacterGraph {
       {
         selector: 'edge',
         css: {
+          opacity: (edge: EdgeSingular) =>
+            settings.showGroupBackground &&
+            edge.source().data('group') !== edge.target().data('group')
+              ? 0.32
+              : 1,
           width: settings.edgeWidth,
           'line-color': (edge) =>
             settings.unifiedEdgeColor
@@ -367,7 +384,9 @@ export class CharacterGraph {
         selector: 'node.neighbor',
         css: {
           label: (node: NodeSingular) =>
-            node.cy().zoom() < 0.32 ? '' : this.getCharacterLabel(node),
+            !settings.showGroupBackground && node.cy().zoom() < 0.32
+              ? ''
+              : this.getCharacterLabel(node),
           'border-width': 3,
           opacity: 1,
           'font-size': (node: NodeSingular) => Math.max(15, 11 / node.cy().zoom()),
@@ -388,6 +407,7 @@ export class CharacterGraph {
     ];
     this.core.style(styles);
     this.updateSelectionStyles();
+    this.updateAllGroupBackgrounds();
   }
 
   private updateAllRelationLabelPositions(): void {
@@ -484,8 +504,97 @@ export class CharacterGraph {
     );
   }
 
+  private scheduleAllGroupBackgroundUpdates(): void {
+    if (this.groupFrame !== undefined) return;
+    this.groupFrame = requestAnimationFrame(() => {
+      this.groupFrame = undefined;
+      this.updateAllGroupBackgrounds();
+    });
+  }
+  private updateAllGroupBackgrounds(): void {
+    if (!this.groupLayer || this.core.destroyed()) return;
+    this.groupLayer.replaceChildren();
+    this.groupLayer.style.display = this.options.showGroupBackground ? 'block' : 'none';
+    if (!this.options.showGroupBackground) return;
+    const nodes = this.core
+      .nodes()
+      .not('.unrevealed')
+      .map((item) => {
+        const node = item as NodeSingular;
+        return {
+          id: node.id(),
+          group: String(node.data('group')),
+          x: node.position('x'),
+          y: node.position('y'),
+          width: node.width(),
+          height: node.height() + 24,
+        };
+      });
+    const regions = getAllGroupRegions(
+      this.document,
+      nodes,
+      this.options.groupPadding,
+      GROUP_COLORS,
+    );
+    const layer = globalThis.document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const pan = this.core.pan();
+    layer.setAttribute('transform', `translate(${pan.x},${pan.y}) scale(${this.core.zoom()})`);
+    for (const region of regions) {
+      const group = globalThis.document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      group.setAttribute('data-character-group', region.name);
+      const rect = globalThis.document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      for (const [key, value] of Object.entries({
+        x: region.x,
+        y: region.y,
+        width: region.width,
+        height: region.height,
+        rx: 18,
+        fill: region.color,
+        'fill-opacity': this.options.groupOpacity,
+        stroke: region.color,
+        'stroke-opacity': 0.48,
+        'stroke-width': 1.3,
+      }))
+        rect.setAttribute(key, String(value));
+      if (this.options.groupBorder === 'dashed') rect.setAttribute('stroke-dasharray', '7 5');
+      group.append(rect);
+      const title = globalThis.document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      title.setAttribute('x', String(region.x + 20));
+      title.setAttribute('y', String(region.y + Math.max(28, 18 / this.core.zoom())));
+      title.setAttribute('fill', region.color);
+      title.setAttribute('font-size', String(Math.max(18, 12 / this.core.zoom())));
+      title.setAttribute('font-weight', '600');
+      title.textContent = `${region.label} · ${region.count} 人`;
+      group.append(title);
+      if (region.description && this.core.zoom() >= 0.55) {
+        const description = globalThis.document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text',
+        );
+        description.setAttribute('x', String(region.x + 20));
+        description.setAttribute('y', String(region.y + 49));
+        description.setAttribute('fill', region.color);
+        description.setAttribute('font-size', '12');
+        description.setAttribute('opacity', '0.85');
+        description.textContent = region.description.slice(0, 30);
+        group.append(description);
+      }
+      layer.append(group);
+    }
+    this.groupLayer.append(layer);
+  }
+
   private getCharacterLabel(node: NodeSingular): string {
     const name = String(node.data('name'));
+    if (this.options.nodeContent === 'identity') {
+      const attributes = node.data('attributes') ?? {};
+      const subtitle =
+        attributes['身份'] ??
+        attributes['职责'] ??
+        (node.data('aliases') ?? []).find((alias: string) => alias !== name) ??
+        '';
+      return subtitle ? `${name}\n${String(subtitle).slice(0, 16)}` : name;
+    }
     if (this.options.nodeContent === 'group') return `${name}\n${node.data('group')}`;
     if (this.options.nodeContent === 'description') {
       const text = String(node.data('description') ?? '');
@@ -570,6 +679,7 @@ export class CharacterGraph {
   }
 
   applyLayout(name: LayoutName): void {
+    this.layoutName = name;
     clearTimeout(this.pendingFit);
     this.core.nodes().stop(true, false);
     const visible = this.core.elements().not('.unrevealed');
@@ -601,22 +711,33 @@ export class CharacterGraph {
       const animate =
         this.options.transition !== 'none' &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const finishLayout = () => {
+        if (this.core.destroyed()) return;
+        this.updateAllCurveRoutes();
+        this.core.edges().removeClass('layout-moving');
+        this.updateAllRelationLabelPositions();
+        this.fit();
+      };
+      const nodes = this.core.nodes();
+      let remaining = nodes.length;
       if (animate) this.core.edges().addClass('layout-moving');
-      this.core.nodes().forEach((node) => {
+      nodes.forEach((node) => {
         const position = positions.get(node.id())!;
         node.stop(true, false);
-        if (animate) node.animate({ position }, { duration: this.options.duration });
+        if (animate)
+          node.animate(
+            { position },
+            {
+              duration: this.options.duration,
+              complete: () => {
+                remaining--;
+                if (remaining === 0) finishLayout();
+              },
+            },
+          );
         else node.position(position);
       });
-      this.pendingFit = setTimeout(
-        () => {
-          this.updateAllCurveRoutes();
-          this.core.edges().removeClass('layout-moving');
-          this.updateAllRelationLabelPositions();
-          this.fit();
-        },
-        animate ? this.options.duration + 30 : 0,
-      );
+      if (!animate) finishLayout();
       return;
     }
     const options: LayoutOptions =
@@ -641,8 +762,19 @@ export class CharacterGraph {
   fit(animate = false): void {
     const visible = this.core.elements().not('.unrevealed');
     const core = this.core.getElementById(findCoreCharacterId(this.document));
-    const center = core.position();
-    const bounds = visible.boundingBox();
+    let center = core.position();
+    const bounds =
+      this.layoutName === 'groups'
+        ? visible.nodes().boundingBox({ includeLabels: false, includeOverlays: false })
+        : visible.boundingBox();
+    if (this.layoutName === 'groups')
+      center = { x: (bounds.x1 + bounds.x2) / 2, y: (bounds.y1 + bounds.y2) / 2 };
+    if (this.options.showGroupBackground) {
+      bounds.y1 -= this.options.groupPadding + 60;
+      bounds.y2 += this.options.groupPadding;
+      bounds.x1 -= this.options.groupPadding;
+      bounds.x2 += this.options.groupPadding;
+    }
     const radiusX = Math.max(180, Math.abs(bounds.x1 - center.x), Math.abs(bounds.x2 - center.x));
     const radiusY = Math.max(150, Math.abs(bounds.y1 - center.y), Math.abs(bounds.y2 - center.y));
     const padding = this.host.clientWidth < 600 ? 28 : 48;
@@ -688,6 +820,8 @@ export class CharacterGraph {
   dispose(): void {
     clearTimeout(this.pendingFit);
     this.resizeObserver.disconnect();
+    if (this.groupFrame !== undefined) cancelAnimationFrame(this.groupFrame);
+    this.groupLayer.remove();
     this.core.destroy();
   }
 }
