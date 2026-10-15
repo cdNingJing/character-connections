@@ -1,17 +1,28 @@
+import { build } from 'vite';
 import { readFile, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
-
-const outputDirectory = resolve('dist');
-let html = await readFile(resolve(outputDirectory, 'index.html'), 'utf8');
-const scriptMatch = html.match(/<script\b[^>]*src="([^"]+)"[^>]*><\/script>/);
-const cssMatch = html.match(/<link\b[^>]*href="([^"]+\.css)"[^>]*>/);
-if (!scriptMatch || !cssMatch) throw new Error('构建产物缺少脚本或样式');
-const javascript = await readFile(resolve(outputDirectory, scriptMatch[1]), 'utf8');
-const css = await readFile(resolve(outputDirectory, cssMatch[1]), 'utf8');
-html = html.replace(
-  scriptMatch[0],
-  () => `<script type="module">${javascript.replace(/<\/script/gi, '<\\/script')}</script>`,
-);
-html = html.replace(cssMatch[0], () => `<style>${css}</style>`);
-await writeFile(resolve(outputDirectory, 'standalone.html'), html);
-console.log('已生成 dist/standalone.html，可直接用浏览器打开');
+const result = await build({
+  configFile: false,
+  logLevel: 'warn',
+  build: {
+    write: false,
+    lib: { entry: 'src/main.ts', formats: ['iife'], name: 'CharacterConnectionsWorkbench' },
+  },
+});
+const outputs = (Array.isArray(result) ? result : [result]).flatMap((result) => result.output);
+const javascript = outputs
+  .filter((output) => output.type === 'chunk')
+  .map((output) => output.code)
+  .join('\n');
+const css = outputs
+  .filter((output) => output.type === 'asset' && output.fileName.endsWith('.css'))
+  .map((output) => String(output.source))
+  .join('\n');
+let html = await readFile('workbench.html', 'utf8');
+html = html
+  .replace(
+    /<script\b[^>]*src="[^"]+"[^>]*><\/script>/,
+    () => `<script>${javascript.replace(/<\/script/gi, '<\\/script')}</script>`,
+  )
+  .replace('</head>', () => `<style>${css}</style></head>`);
+await writeFile('dist/standalone.html', html);
+console.log('已生成独立工作台 dist/standalone.html');

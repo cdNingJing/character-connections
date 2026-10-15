@@ -19,3 +19,8 @@ export type {
 export { getAllSemanticPositions, getAllCurveRoutes, findCoreCharacterId } from './semantic-layout';
 
 export { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';
+
+export { createCharacterGraph, CharacterGraphComponent } from './component';
+export type { CharacterGraphProps } from './component';
+
+export { LAYOUT_NAMES } from './model';

@@ -32,3 +32,8 @@
 [data-character-graph] > div {
   z-index: 1;
 }
+
+character-connections {
+  display: block;
+  min-height: 320px;
+}

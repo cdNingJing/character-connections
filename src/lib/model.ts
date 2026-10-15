@@ -1,3 +1,14 @@
+export const LAYOUT_NAMES = [
+  'semantic',
+  'groups',
+  'mindmap',
+  'tree',
+  'horizontal-tree',
+  'radial',
+  'circle',
+  'grid',
+  'force',
+] as const;
 export interface Character {
   id: string;
   name: string;
@@ -371,7 +382,12 @@ export function getAllGroupPositions(
   const groups = [...new Set(document.characters.map((person) => person.group))];
   const positions = new Map<string, { x: number; y: number }>();
   const columns = Math.ceil(Math.sqrt(groups.length));
-  const spacing = Math.max(330, Math.sqrt(document.characters.length / groups.length) * 120);
+  const largestRadius = Math.max(
+    ...groups.map((group) =>
+      Math.max(85, document.characters.filter((person) => person.group === group).length * 18),
+    ),
+  );
+  const spacing = Math.max(330, largestRadius * 2 + 220);
   groups.forEach((group, groupIndex) => {
     const members = document.characters.filter((person) => person.group === group);
     const radius = Math.max(85, members.length * 18);

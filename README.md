@@ -4,7 +4,7 @@
 
 以《西游记》展示从单个人物到复杂关系网的展开过程。默认布局由规则控制，不使用随机位置；核心人物居中，相关人物按指定层级与左右顺序排列。
 
-![西游记人物关系演示](docs/images/journey-demo.png)
+![按布局分类的组件示例](docs/images/component-gallery.png)
 
 ## 本地运行
 
@@ -97,30 +97,34 @@ npm run preview
 
 协议见 [schema.json](schema.json) 和 [数据格式](docs/data-format.md)。
 
-## 接入自己的页面
+## 接入自己的项目
 
-组件入口为 `src/lib/index.ts`。当前提供源码集成，还未发布 npm 包。
+当前提供可安装的 `.tgz` 包，尚未发布到 npm registry。`npm run build` 同时生成示例站、类型声明、库和 `dist/character-connections-0.5.0.tgz`。
 
-```ts
-import { CharacterGraph, parseGraphDocument } from './src/lib';
-
-const container = document.querySelector<HTMLElement>('#graph')!;
-container.style.height = '600px';
-const graph = new CharacterGraph(container, parseGraphDocument(data), {
-  background: '#142c3e',
-  edgeShape: 'bezier',
-  transition: 'smooth',
-});
-
-graph.selectCharacterById('wukong');
-graph.updateDataPreservingPositions(nextStageData);
-graph.applyLayout('semantic');
-graph.applyAppearanceOptions({ edgeLine: 'dashed', edgeWidth: 2 });
-const saved = graph.exportGraphDocument();
-graph.dispose();
+```bash
+npm install ./character-connections-0.5.0.tgz
 ```
 
-组件自动加载背景样式。页面卸载时调用 `dispose()` 释放画布与观察器。
+```typescript
+import { createCharacterGraph, parseGraphDocument } from 'character-connections';
+import 'character-connections/style.css';
+import rawData from './graph-data.json';
+
+const chart = createCharacterGraph(document.querySelector<HTMLElement>('#graph')!, {
+  data: parseGraphDocument(rawData),
+  layout: 'mindmap',
+  appearance: { edgeShape: 'horizontal-taxi' },
+  onSelectionChange: (selection) => console.log(selection),
+});
+chart.update({ appearance: { nodeShape: 'ellipse' } });
+// 页面卸载时调用 chart.destroy()。
+```
+
+容器必须有明确高度，例如 `height: 560px`。首页按 8 种布局分类，实时同步参数与调用代码；可切换 TypeScript、HTML 自定义元素、React、Vue 3，编辑或下载配套数据。原工作台在 `/workbench.html`。
+
+也可以使用 `character-connections/element` 导出的 `registerCharacterConnections()`，注册 `<character-connections>` 标准自定义元素。它的 `data`、`options` 是 JS 属性，`layout` 同时支持属性和 HTML attribute，选中时派发 `selection-change` 事件。导入不会自动注册元素，SSR 环境中应在浏览器挂载后创建组件。
+
+完整说明见 [组件 API](docs/component-api.md)。
 
 ## 开发与范围
 
@@ -149,3 +153,9 @@ npm run build
 ### v0.4 连线与文字
 
 8 种连线路径，支持调节曲线弯曲程度和折线圆角。关系文字可设置字号、换行宽度、底色、方向、位置及偏移，自动尽量错开人物和其他文字；支持只显示选中的一条关系。旧 JSON 继续兼容，全部新设置可导入导出。
+
+### v0.5 可复用组件与示例站
+
+首页按布局分类展示 8 种示例。每个示例可以切换数据和中心人物、调整样式、编辑 JSON、下载数据，并复制 TypeScript、HTML 自定义元素、React 或 Vue 3 的调用代码。复制内容仅包含相对默认值有变化的外观参数。
+
+组件提供 `createCharacterGraph` 和 `<character-connections>` 两种接入方式；构建生成独立 ESM、CSS、类型声明及可安装的 `.tgz` 包。`npm run dev` 会先生成组件包，确保示例页下载链接可用。

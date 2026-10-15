@@ -97,6 +97,7 @@ export class CharacterGraph {
     clearTimeout(this.pendingFit);
     this.core.stop(true, false);
     this.core.nodes().stop(true, false);
+    this.core.edges().removeClass('layout-moving');
     const previousSelection = this.selection;
     const characterIds = new Set(parsed.characters.map((person) => person.id));
     const relationIds = new Set(parsed.relations.map((relation) => relation.id));
@@ -382,6 +383,7 @@ export class CharacterGraph {
         },
       },
       { selector: '.unrevealed', css: { display: 'none' } },
+      { selector: 'edge.layout-moving', css: { display: 'none' } },
       { selector: '.entering', css: { opacity: 0 } },
     ];
     this.core.style(styles);
@@ -396,15 +398,20 @@ export class CharacterGraph {
       .filter(
         (edge) =>
           !edge.hasClass('unrevealed') &&
+          !edge.hasClass('layout-moving') &&
           (settings.labels === 'all' ||
             (settings.labels === 'related' && edge.hasClass('related') && zoom >= 0.45) ||
             (settings.labels !== 'none' && edge.hasClass('focused'))),
       );
     const inputs = edges.map((item) => {
       const edge = item as EdgeSingular;
-      const middle = edge.midpoint();
       const a = edge.source().position(),
         b = edge.target().position();
+      const renderedMiddle = edge.midpoint();
+      const middle =
+        renderedMiddle && Number.isFinite(renderedMiddle.x) && Number.isFinite(renderedMiddle.y)
+          ? renderedMiddle
+          : { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       const size = edge.hasClass('related')
         ? Math.max(settings.labelFontSize, settings.labelFontSize / zoom)
         : settings.labels === 'all'
@@ -434,7 +441,11 @@ export class CharacterGraph {
           )
         : [];
       const segments = edge.segmentPoints();
-      const polyline = [edge.sourceEndpoint(), ...(segments ?? [middle]), edge.targetEndpoint()];
+      const polyline = [
+        edge.sourceEndpoint() ?? a,
+        ...(segments ?? [middle]),
+        edge.targetEndpoint() ?? b,
+      ].filter((point) => point && Number.isFinite(point.x) && Number.isFinite(point.y));
       const candidates = ratios.flatMap((ratio) => {
         const point = curved
           ? points[Math.round((points.length - 1) * ratio)]
@@ -464,7 +475,8 @@ export class CharacterGraph {
     );
     this.core.batch(() =>
       this.core.edges().forEach((edge) => {
-        const middle = edge.midpoint(),
+        if (edge.hasClass('layout-moving') || edge.hasClass('unrevealed')) return;
+        const middle = edge.midpoint() ?? { x: 0, y: 0 },
           point = placements.get(edge.id());
         edge.data('labelOffsetX', point ? point.x - middle.x : 0);
         edge.data('labelOffsetY', point ? point.y - middle.y : settings.labelOffset);
@@ -561,7 +573,7 @@ export class CharacterGraph {
     clearTimeout(this.pendingFit);
     this.core.nodes().stop(true, false);
     const visible = this.core.elements().not('.unrevealed');
-    this.core.edges().removeClass('cross-branch');
+    this.core.edges().removeClass('cross-branch layout-moving');
     if (name !== 'circle' && name !== 'force') {
       const cleanDocument = {
         ...this.document,
@@ -589,6 +601,7 @@ export class CharacterGraph {
       const animate =
         this.options.transition !== 'none' &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (animate) this.core.edges().addClass('layout-moving');
       this.core.nodes().forEach((node) => {
         const position = positions.get(node.id())!;
         node.stop(true, false);
@@ -598,6 +611,7 @@ export class CharacterGraph {
       this.pendingFit = setTimeout(
         () => {
           this.updateAllCurveRoutes();
+          this.core.edges().removeClass('layout-moving');
           this.updateAllRelationLabelPositions();
           this.fit();
         },
