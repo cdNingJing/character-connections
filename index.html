@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <span class="version">v0.2.0 · MIT</span
+        <span class="version">v0.3.0 · MIT</span
         ><button id="import-button" class="secondary">导入 JSON</button
         ><button id="export-button" class="primary">导出 JSON</button>
       </div>
@@ -35,27 +35,6 @@
           <span class="data-count" id="data-count"></span>
         </div>
 
-        <section class="demo-progression" id="demo-progression" aria-labelledby="progression-title">
-          <div class="progression-heading">
-            <h2 id="progression-title">从单个人物展开关系</h2>
-            <button id="next-stage" class="secondary">下一阶段</button>
-          </div>
-          <div class="stage-buttons" aria-label="演示阶段">
-            <button data-stage="0" aria-current="step">
-              <span>1</span>单个人物<small>1 人物</small>
-            </button>
-            <button data-stage="1" aria-current="false">
-              <span>2</span>取经团队<small>5 人物</small>
-            </button>
-            <button data-stage="2" aria-current="false">
-              <span>3</span>神佛与天庭<small>13 人物</small>
-            </button>
-            <button data-stage="3" aria-current="false">
-              <span>4</span>完整示例<small>26 人物</small>
-            </button>
-          </div>
-          <p id="stage-description" aria-live="polite"></p>
-        </section>
         <div class="layout-rules" id="layout-rules">
           <span>中心：孙悟空</span><span>同层：取经团队</span><span>上方：神佛与天庭</span
           ><span>下方：妖怪</span>
@@ -69,7 +48,7 @@
             ><input
               id="character-search"
               type="search"
-              placeholder="搜索人物姓名"
+              placeholder="搜索姓名、别名或资料"
               autocomplete="off"
           /></label>
           <div class="toolbar-actions">
@@ -106,24 +85,6 @@
             >120 / 120</output
           >
         </div>
-        <div class="below-canvas">
-          <section class="selection-card" aria-labelledby="selection-title">
-            <div class="selection-top">
-              <h2 id="selection-title">人物与关系说明</h2>
-              <span id="selection-meta"></span>
-            </div>
-            <div id="selection-content"></div>
-          </section>
-          <section class="usage-note">
-            <h2>使用说明</h2>
-            <p>
-              点击人物突出相关连线，其他人物保持原位。点击连线查看关系说明。拖动画布移动视图，滚轮或双指缩放。
-            </p>
-            <p>
-              示例关系根据《西游记》整理，演示阶段表示图谱复杂度，不代表章节或同时发生。设置和人物位置保存在当前浏览器。
-            </p>
-          </section>
-        </div>
       </section>
       <button
         id="settings-backdrop"
@@ -141,6 +102,27 @@
           <h2 id="settings-title">图谱设置</h2>
           <button id="close-settings" class="secondary mobile-only">关闭</button>
         </div>
+        <section class="demo-progression" id="demo-progression" aria-labelledby="progression-title">
+          <div class="progression-heading">
+            <h2 id="progression-title">从单个人物展开关系</h2>
+            <button id="next-stage" class="secondary">下一阶段</button>
+          </div>
+          <div class="stage-buttons" aria-label="演示阶段">
+            <button data-stage="0" aria-current="step">
+              <span>1</span>单个人物<small>1 人物</small>
+            </button>
+            <button data-stage="1" aria-current="false">
+              <span>2</span>取经团队<small>5 人物</small>
+            </button>
+            <button data-stage="2" aria-current="false">
+              <span>3</span>神佛与天庭<small>13 人物</small>
+            </button>
+            <button data-stage="3" aria-current="false">
+              <span>4</span>完整示例<small>26 人物</small>
+            </button>
+          </div>
+          <p id="stage-description" aria-live="polite"></p>
+        </section>
         <details class="setting-section" open>
           <summary>数据与布局</summary>
           <div class="setting-content">
@@ -153,18 +135,54 @@
             <label class="field"
               >布局方式<select id="layout">
                 <option value="semantic">规则分层排列</option>
+                <option value="mindmap">思维导图 · 双向分支</option>
+                <option value="tree">树形 · 从上到下</option>
+                <option value="horizontal-tree">树形 · 从左到右</option>
+                <option value="radial">同心圆 · 按关系距离</option>
+                <option value="grid">网格 · 方便逐个查看</option>
                 <option value="groups">按分组排列</option>
                 <option value="circle">环形排列</option>
               </select></label
             >
+            <label class="field">布局中心人物<select id="core-character"></select></label>
             <button id="apply-layout" class="secondary full-width">重新排列人物</button>
             <p class="field-help">
-              规则布局将核心人物置于中心，按 level 分上下层、order
-              分左右。重新排列会覆盖手动调整的位置。
+              规则布局按上下层和左右次序排列。思维导图以核心人物展开关系分支，额外关系以点线保留。重新排列会覆盖手动位置。
             </p>
           </div>
         </details>
         <details class="setting-section" open>
+          <summary>人物与内容</summary>
+          <div class="setting-content">
+            <label class="field"
+              >人物形状<select id="node-shape">
+                <option value="round-rectangle">圆角矩形</option>
+                <option value="ellipse">圆形</option>
+                <option value="diamond">菱形</option>
+                <option value="hexagon">六边形</option>
+              </select></label
+            >
+            <label class="field"
+              >人物大小<input id="node-size" type="range" min="32" max="96" step="4"
+            /></label>
+            <label class="field"
+              >画布人物文字<select id="node-content">
+                <option value="name">只显示姓名</option>
+                <option value="group">姓名与分组</option>
+                <option value="description">姓名与简介摘要</option>
+              </select></label
+            >
+            <p class="field-help">完整资料在右侧查看。以下开关控制详情内容。</p>
+            <label class="check-field"><input id="show-aliases" type="checkbox" />显示别名</label>
+            <label class="check-field"
+              ><input id="show-attributes" type="checkbox" />显示自定义资料</label
+            >
+            <label class="check-field"
+              ><input id="show-description" type="checkbox" />显示人物简介</label
+            >
+          </div>
+        </details>
+        <details class="setting-section">
           <summary>背景</summary>
           <div class="setting-content">
             <label class="color-field" for="background-color"
@@ -192,7 +210,7 @@
           </div>
         </details>
         <details class="setting-section" open>
-          <summary>连线</summary>
+          <summary>连线与文字</summary>
           <div class="setting-content">
             <label class="field"
               >连线形状<select id="edge-shape">
@@ -250,6 +268,26 @@
         </details>
         <button id="reset-appearance" class="secondary full-width">恢复默认外观</button>
       </aside>
+      <aside class="inspector-panel" aria-label="人物与关系详情">
+        <div class="below-canvas">
+          <section class="selection-card" aria-labelledby="selection-title">
+            <div class="selection-top">
+              <h2 id="selection-title">人物与关系说明</h2>
+              <span id="selection-meta"></span>
+            </div>
+            <div id="selection-content"></div>
+          </section>
+          <section class="usage-note">
+            <h2>使用说明</h2>
+            <p>
+              点击人物突出相关连线，其他人物保持原位。点击连线查看关系说明。拖动画布移动视图，滚轮或双指缩放。
+            </p>
+            <p>
+              示例关系根据《西游记》整理，演示阶段表示图谱复杂度，不代表章节或同时发生。设置和人物位置保存在当前浏览器。
+            </p>
+          </section>
+        </div>
+      </aside>
     </main>
     <dialog id="import-dialog" aria-labelledby="import-title">
       <form method="dialog" class="dialog-heading">
@@ -278,6 +316,7 @@
       </div>
     </dialog>
     <div id="notification" class="notification" role="status" hidden></div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

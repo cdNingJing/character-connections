@@ -60,9 +60,14 @@ function saveCurrentProject(): void {
 
 function renderProjectSummary(): void {
   $('graph-title').textContent = graph.document.title;
+  $('core-character').innerHTML = graph.document.characters
+    .map((person) => `<option value="${escapeHtml(person.id)}">${escapeHtml(person.name)}</option>`)
+    .join('');
+  $<HTMLSelectElement>('core-character').value =
+    graph.document.coreId ?? graph.document.characters[0].id;
   $('chapter-row').hidden = graph.document.maxChapter <= 1;
   $('demo-progression').hidden = dataSource !== 'demo';
-  $('layout-rules').hidden = dataSource !== 'demo';
+  $('layout-rules').hidden = true;
   renderDemoProgression();
   const visible = getAllVisibleCharactersByChapter(graph.document, graph.chapter);
   const relations = getAllActiveRelationsByChapter(graph.document, graph.chapter);
@@ -104,7 +109,16 @@ function renderSelection(selection: Selection): void {
     $('selection-label').textContent = `${person.name}的相关关系`;
     $('selection-meta').textContent = `${person.group} · ${relations.length} 段关系`;
     $('selection-content').innerHTML =
-      `<h3 class="selection-name">${escapeHtml(person.name)}</h3><p class="selection-description">${escapeHtml(person.description ?? '未填写人物介绍')}</p>${graph.document.maxChapter > 1 ? `<p class="section-label">第 ${person.chapter ?? 1} 章出场</p>` : ''}<div class="relation-list">${relations
+      `<h3 class="selection-name">${escapeHtml(person.name)}</h3><p class="selection-description">${graph.options.showDescription ? escapeHtml(person.description ?? '未填写人物介绍') : ''}</p>${graph.options.showAliases && person.aliases?.length ? `<p class="profile-aliases">别名：${person.aliases.map(escapeHtml).join('、')}</p>` : ''}${
+        graph.options.showAttributes && person.attributes
+          ? `<dl class="profile-attributes">${Object.entries(person.attributes)
+              .map(
+                ([key, value]) =>
+                  `<div><dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd></div>`,
+              )
+              .join('')}</dl>`
+          : ''
+      }${graph.document.maxChapter > 1 ? `<p class="section-label">第 ${person.chapter ?? 1} 章出场</p>` : ''}<div class="relation-list">${relations
         .map((relation) => {
           const otherId = relation.source === person.id ? relation.target : relation.source;
           const other = graph.document.characters.find((item) => item.id === otherId)!;
@@ -129,7 +143,15 @@ function renderCharacterSearchResults(): void {
   results.hidden = !query;
   if (!query) return;
   const matches = getAllVisibleCharactersByChapter(graph.document, graph.chapter).filter((person) =>
-    person.name.toLocaleLowerCase().includes(query),
+    [
+      person.name,
+      ...(person.aliases ?? []),
+      ...(person.tags ?? []),
+      ...Object.values(person.attributes ?? {}),
+    ]
+      .join(' ')
+      .toLocaleLowerCase()
+      .includes(query),
   );
   results.innerHTML = matches.length
     ? matches
@@ -142,6 +164,12 @@ function renderCharacterSearchResults(): void {
 }
 
 const optionFields: Record<string, keyof GraphOptions> = {
+  'node-shape': 'nodeShape',
+  'node-size': 'nodeSize',
+  'node-content': 'nodeContent',
+  'show-aliases': 'showAliases',
+  'show-attributes': 'showAttributes',
+  'show-description': 'showDescription',
   'background-color': 'background',
   pattern: 'pattern',
   'edge-shape': 'edgeShape',
@@ -184,11 +212,12 @@ for (const [id, key] of Object.entries(optionFields)) {
       const value =
         field instanceof HTMLInputElement && field.type === 'checkbox'
           ? field.checked
-          : ['edgeWidth', 'duration'].includes(key)
+          : ['edgeWidth', 'duration', 'nodeSize'].includes(key)
             ? Number(field.value)
             : field.value;
       graph.applyAppearanceOptions({ [key]: value });
       syncOptionFields();
+      renderSelection(graph.selection);
       saveCurrentProject();
     },
   );
@@ -223,7 +252,8 @@ function setDemoStage(stage: number): void {
   if (preserve) graph.updateDataPreservingPositions(document);
   else graph.loadData(document);
   $<HTMLSelectElement>('dataset').value = 'demo';
-  $<HTMLSelectElement>('layout').value = 'semantic';
+  const selectedLayout = $<HTMLSelectElement>('layout').value as LayoutName;
+  if (selectedLayout !== 'semantic') graph.applyLayout(selectedLayout);
   renderProjectSummary();
   graph.selectCharacterById('wukong');
   renderCharacterSearchResults();
@@ -243,6 +273,17 @@ $('apply-layout').addEventListener('click', () => {
   clearTimeout(layoutTimer);
   layoutTimer = setTimeout(saveCurrentProject, graph.options.duration + 80);
   notify('已重新排列人物');
+});
+$('core-character').addEventListener('change', () => {
+  const id = $<HTMLSelectElement>('core-character').value;
+  graph.document.coreId = id;
+  graph.core.nodes().forEach((node) => {
+    node.data('isCore', node.id() === id);
+  });
+  graph.applyLayout($<HTMLSelectElement>('layout').value as LayoutName);
+  graph.selectCharacterById(id);
+  clearTimeout(layoutTimer);
+  layoutTimer = setTimeout(saveCurrentProject, graph.options.duration + 80);
 });
 $('clear-selection').addEventListener('click', () => graph.clearSelection());
 $('zoom-in').addEventListener('click', () => graph.zoomBy(1.25));

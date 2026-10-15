@@ -907,3 +907,336 @@ button:disabled {
     max-width: 58%;
   }
 }
+
+/* Workbench: configuration / canvas / story details. */
+.app-header {
+  padding: 14px 24px;
+}
+.app-layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr) 300px;
+  gap: 0;
+  padding: 0;
+  max-width: none;
+  align-items: start;
+}
+.settings-panel {
+  grid-column: 1;
+  grid-row: 1;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
+  max-height: calc(100dvh - 75px);
+  overflow: auto;
+  padding: 18px;
+  background: #fff;
+  position: sticky;
+  top: 0;
+}
+.graph-workspace {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 22px;
+  min-width: 0;
+}
+.inspector-panel {
+  grid-column: 3;
+  grid-row: 1;
+  height: calc(100dvh - 75px);
+  overflow: auto;
+  border-left: 1px solid var(--line);
+  background: white;
+  padding: 20px 16px;
+}
+.below-canvas {
+  display: block;
+  margin: 0;
+}
+.selection-card {
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.selection-top {
+  display: block;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+.selection-top h2 {
+  font-size: 13px;
+}
+#selection-meta {
+  display: block;
+  margin-top: 8px;
+  font-size: 11px;
+}
+.selection-name {
+  font:
+    600 28px/1.5 'Noto Serif SC',
+    'SimSun',
+    serif;
+  margin-bottom: 12px;
+}
+.selection-description {
+  font:
+    16px/1.9 'Noto Serif SC',
+    'SimSun',
+    serif;
+}
+.profile-aliases {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 12px 0;
+}
+.profile-attributes {
+  margin: 20px 0;
+}
+.profile-attributes div {
+  border-bottom: 1px solid #edf1f4;
+  padding: 10px 0;
+}
+.profile-attributes dt {
+  font-size: 11px;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.profile-attributes dd {
+  font:
+    15px/1.6 'SimSun',
+    serif;
+  margin: 0;
+}
+.relation-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 20px;
+}
+.relation-list button {
+  text-align: left;
+  font-size: 13px;
+  padding: 11px;
+  background: #f4f7f8;
+  border: 1px solid #e4eaee;
+  border-radius: 7px;
+  color: #304b5e;
+}
+.usage-note {
+  border-top: 1px solid var(--line);
+  margin-top: 26px;
+  padding-top: 18px;
+  font-size: 11px;
+  line-height: 1.9;
+}
+.usage-note h2 {
+  font-size: 12px;
+}
+.demo-progression {
+  padding: 0 0 20px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.progression-heading {
+  align-items: center;
+  gap: 8px;
+}
+.progression-heading h2 {
+  font-size: 12px;
+}
+#next-stage {
+  font-size: 11px;
+  padding: 6px;
+}
+.stage-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 12px;
+}
+.stage-buttons button {
+  padding: 8px;
+  min-height: 56px;
+  font-size: 11px;
+  gap: 5px;
+}
+.stage-buttons small {
+  font-size: 10px;
+}
+#stage-description {
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.canvas-frame {
+  height: calc(100dvh - 230px);
+  min-height: 430px;
+  border-radius: 12px;
+}
+#graph {
+  height: 100%;
+  min-height: 0;
+}
+.graph-heading {
+  margin-bottom: 18px;
+}
+.graph-heading h2 {
+  font-size: 21px;
+}
+.main-toolbar {
+  margin-bottom: 12px;
+}
+.canvas-top {
+  font-size: 11px;
+  gap: 8px;
+}
+.canvas-legend {
+  font-size: 10px;
+  gap: 10px;
+}
+.setting-section {
+  margin-bottom: 4px;
+}
+.setting-section summary {
+  font-size: 12px;
+}
+.setting-content {
+  gap: 12px;
+}
+.field,
+.check-field,
+.color-field,
+.range-field {
+  font-size: 12px;
+}
+select,
+input:not([type='checkbox']):not([type='range']):not([type='color']),
+textarea {
+  border: 1px solid #d5dfe5;
+  border-radius: 7px;
+  background-color: #f8fafb;
+  color: #213d50;
+  min-height: 38px;
+}
+.field-help {
+  font-size: 11px;
+  line-height: 1.8;
+}
+@media (max-width: 1200px) and (min-width: 851px) {
+  .app-layout {
+    grid-template-columns: 230px minmax(0, 1fr);
+  }
+  .inspector-panel {
+    grid-column: 2;
+    grid-row: 2;
+    height: auto;
+    border: 0;
+    padding: 20px 24px;
+  }
+  .canvas-frame {
+    height: 570px;
+  }
+  .settings-panel {
+    grid-row: 1 / span 2;
+  }
+}
+@media (max-width: 850px) {
+  .app-layout {
+    display: block;
+  }
+  .app-header {
+    padding: 12px;
+    gap: 10px;
+  }
+  .brand p,
+  .version {
+    display: none;
+  }
+  .brand h1 {
+    font-size: 16px;
+  }
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+  }
+  .header-actions {
+    gap: 5px;
+  }
+  .header-actions button {
+    font-size: 11px;
+    padding: 9px;
+  }
+  .graph-workspace {
+    padding: 16px 12px;
+  }
+  .graph-heading h2 {
+    font-size: 20px;
+  }
+  .canvas-frame {
+    height: 58dvh;
+    min-height: 360px;
+  }
+  .inspector-panel {
+    height: auto;
+    padding: 20px 18px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+  .settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 100dvh;
+    width: min(340px, 90vw);
+    z-index: 50;
+    transform: translateX(110%);
+    padding: 20px;
+  }
+  .settings-panel[data-open='true'] {
+    transform: translateX(0);
+  }
+  .stage-buttons button {
+    font-size: 12px;
+  }
+  select,
+  input,
+  textarea {
+    font-size: 16px;
+  }
+  .canvas-top #canvas-status {
+    display: none;
+  }
+  .canvas-legend {
+    max-width: 100%;
+    flex-wrap: wrap;
+    padding-right: 8px;
+  }
+  .main-toolbar {
+    gap: 8px;
+  }
+  .search-field {
+    min-width: 0;
+    flex: 1;
+  }
+  .toolbar-actions {
+    gap: 5px;
+  }
+  .toolbar-actions button {
+    font-size: 11px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 850px) {
+  .settings-panel:not([data-open='true']) {
+    display: none;
+  }
+  .settings-panel[data-open='true'] {
+    display: block;
+  }
+}

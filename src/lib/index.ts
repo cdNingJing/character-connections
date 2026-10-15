@@ -17,3 +17,5 @@ export type {
   TransitionName,
 } from './model';
 export { getAllSemanticPositions, getAllCurveRoutes, findCoreCharacterId } from './semantic-layout';
+
+export { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';

@@ -88,3 +88,9 @@
 ## 核心人物与位置约束
 
 可选的 coreId 指向中心人物 id。人物的 placement 包含整数 level（-20 到 20）与 order（-100 到 100），分别控制上下层和左右顺序。position 是可选的固定坐标，优先于规则位置。完整规则见 [规则布局](layout-rules.md)。
+
+## 人物资料与内容设置
+
+人物支持 `aliases: string[]`、`tags: string[]` 和 `attributes: Record<string, string>`。自定义资料以键值显示在详情区，导入导出会保留。文字作为纯文本显示。
+
+`appearance.nodeShape` 支持 ellipse、round-rectangle、diamond、hexagon；`nodeSize` 为 32–96；`nodeContent` 为 name、group、description。`showAliases`、`showAttributes`、`showDescription` 控制详情内容。

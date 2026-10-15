@@ -1,4 +1,5 @@
 import cytoscape from 'cytoscape';
+import { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';
 import './graph.css';
 import type {
   Core,
@@ -211,17 +212,21 @@ export class CharacterGraph {
       {
         selector: 'node',
         css: {
-          width: 48,
-          height: 48,
-          label: 'data(name)',
+          shape: settings.nodeShape,
+          width:
+            settings.nodeShape === 'round-rectangle' ? settings.nodeSize * 1.9 : settings.nodeSize,
+          height: settings.nodeSize,
+          label: (node: NodeSingular) => this.getCharacterLabel(node),
           'background-color': isLight ? '#ffffff' : '#203d51',
           'border-color': 'data(color)',
           'border-width': 2,
           color: textColor,
           'font-size': 15,
           'font-family': 'Microsoft YaHei, sans-serif',
-          'text-valign': 'bottom',
-          'text-margin-y': 10,
+          'text-valign': settings.nodeShape === 'round-rectangle' ? 'center' : 'bottom',
+          'text-margin-y': settings.nodeShape === 'round-rectangle' ? 0 : 10,
+          'text-wrap': 'wrap',
+          'text-max-width': '160px',
           'text-background-color': settings.background,
           'text-background-opacity': 0.9,
           'text-background-padding': '3px',
@@ -271,8 +276,12 @@ export class CharacterGraph {
         selector: 'edge[?directed]',
         css: { 'target-arrow-shape': settings.arrows ? 'triangle' : 'none' },
       },
+      { selector: 'edge.cross-branch', css: { opacity: 0.2, 'line-style': 'dotted' } },
       { selector: '.dimmed', css: { opacity: 0.13, label: '' } },
-      { selector: 'node.dimmed', css: { opacity: 0.5, label: 'data(name)' } },
+      {
+        selector: 'node.dimmed',
+        css: { opacity: 0.5, label: (node: NodeSingular) => this.getCharacterLabel(node) },
+      },
       {
         selector: 'node.focused',
         css: {
@@ -309,7 +318,8 @@ export class CharacterGraph {
       {
         selector: 'node.neighbor',
         css: {
-          label: (node: NodeSingular) => (node.cy().zoom() < 0.32 ? '' : node.data('name')),
+          label: (node: NodeSingular) =>
+            node.cy().zoom() < 0.32 ? '' : this.getCharacterLabel(node),
           'border-width': 3,
           opacity: 1,
           'font-size': (node: NodeSingular) => Math.max(15, 11 / node.cy().zoom()),
@@ -319,7 +329,7 @@ export class CharacterGraph {
       {
         selector: 'node[?isCore]',
         css: {
-          label: 'data(name)',
+          label: (node: NodeSingular) => this.getCharacterLabel(node),
           'font-size': (node: NodeSingular) => Math.max(15, 12 / node.cy().zoom()),
           'min-zoomed-font-size': 0,
         },
@@ -329,6 +339,16 @@ export class CharacterGraph {
     ];
     this.core.style(styles);
     this.updateSelectionStyles();
+  }
+
+  private getCharacterLabel(node: NodeSingular): string {
+    const name = String(node.data('name'));
+    if (this.options.nodeContent === 'group') return `${name}\n${node.data('group')}`;
+    if (this.options.nodeContent === 'description') {
+      const text = String(node.data('description') ?? '');
+      return `${name}\n${text.length > 18 ? text.slice(0, 18) + '…' : text}`;
+    }
+    return name;
   }
 
   private getRelationColor(color: string, isLight: boolean): string {
@@ -409,7 +429,8 @@ export class CharacterGraph {
     clearTimeout(this.pendingFit);
     this.core.nodes().stop(true, false);
     const visible = this.core.elements().not('.unrevealed');
-    if (name === 'groups' || name === 'semantic') {
+    this.core.edges().removeClass('cross-branch');
+    if (name !== 'circle' && name !== 'force') {
       const cleanDocument = {
         ...this.document,
         characters: this.document.characters.map((person) => ({ ...person, position: undefined })),
@@ -417,7 +438,22 @@ export class CharacterGraph {
       const positions =
         name === 'semantic'
           ? getAllSemanticPositions(cleanDocument, false)
-          : getAllGroupPositions(cleanDocument);
+          : name === 'groups'
+            ? getAllGroupPositions(cleanDocument)
+            : getAllStructuredPositions(cleanDocument, name);
+      if (name === 'mindmap' || name === 'tree' || name === 'horizontal-tree') {
+        const { parents } = getAllRootedBranches(cleanDocument);
+        const pairs = new Set<string>();
+        this.core.edges().forEach((edge) => {
+          const source = edge.source().id(),
+            target = edge.target().id();
+          const pair = [source, target].sort().join('|');
+          const branch =
+            (parents.get(source) === target || parents.get(target) === source) && !pairs.has(pair);
+          edge.toggleClass('cross-branch', !branch);
+          if (branch) pairs.add(pair);
+        });
+      }
       const animate =
         this.options.transition !== 'none' &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches;

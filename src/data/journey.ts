@@ -1,3 +1,4 @@
+import { JOURNEY_PROFILES } from './journey-profiles.ts';
 import type { Character, GraphDocument, Relation } from '../lib/model';
 import { getAllSemanticPositions } from '../lib/semantic-layout.ts';
 
@@ -261,7 +262,12 @@ export function createJourneyDocument(stage = 0): GraphDocument {
     ...full,
     characters: characters
       .filter((person) => ids.has(person.id))
-      .map((person) => ({ ...person, position: positions.get(person.id) })),
+      .map((person) => ({
+        ...person,
+        ...JOURNEY_PROFILES[person.id],
+        tags: [person.group],
+        position: positions.get(person.id),
+      })),
     relations: relations.filter((edge) => ids.has(edge.source) && ids.has(edge.target)),
   };
 }

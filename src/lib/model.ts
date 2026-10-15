@@ -3,6 +3,9 @@ export interface Character {
   name: string;
   group: string;
   description?: string;
+  aliases?: string[];
+  tags?: string[];
+  attributes?: Record<string, string>;
   chapter?: number;
   position?: { x: number; y: number };
   placement?: { level: number; order: number };
@@ -30,11 +33,26 @@ export interface GraphDocument {
   coreId?: string;
 }
 
-export type LayoutName = 'semantic' | 'groups' | 'circle' | 'force';
+export type LayoutName =
+  | 'semantic'
+  | 'groups'
+  | 'circle'
+  | 'force'
+  | 'mindmap'
+  | 'tree'
+  | 'horizontal-tree'
+  | 'radial'
+  | 'grid';
 export type EdgeShape = 'bezier' | 'straight' | 'round-taxi';
 export type TransitionName = 'none' | 'smooth' | 'fade';
 
 export interface GraphOptions {
+  nodeShape: 'ellipse' | 'round-rectangle' | 'diamond' | 'hexagon';
+  nodeSize: number;
+  nodeContent: 'name' | 'group' | 'description';
+  showAliases: boolean;
+  showAttributes: boolean;
+  showDescription: boolean;
   background: string;
   pattern: 'dots' | 'grid' | 'none';
   backgroundImage: string;
@@ -50,6 +68,12 @@ export interface GraphOptions {
 }
 
 export const DEFAULT_OPTIONS: GraphOptions = {
+  nodeShape: 'round-rectangle',
+  nodeSize: 56,
+  nodeContent: 'name',
+  showAliases: true,
+  showAttributes: true,
+  showDescription: true,
   background: '#142c3e',
   pattern: 'dots',
   backgroundImage: '',
@@ -87,6 +111,8 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     result[key] = input[key];
   }
   const choices = {
+    nodeShape: ['ellipse', 'round-rectangle', 'diamond', 'hexagon'],
+    nodeContent: ['name', 'group', 'description'],
     pattern: ['dots', 'grid', 'none'],
     edgeShape: ['bezier', 'straight', 'round-taxi'],
     edgeLine: ['solid', 'dashed', 'dotted'],
@@ -100,19 +126,25 @@ export function parseGraphOptions(input: unknown): GraphOptions {
       throw new Error(`${key} 的值不受支持`);
     Object.assign(result, { [key]: value });
   }
-  for (const key of ['unifiedEdgeColor', 'arrows'] as const) {
+  for (const key of [
+    'unifiedEdgeColor',
+    'arrows',
+    'showAliases',
+    'showAttributes',
+    'showDescription',
+  ] as const) {
     if (input[key] === undefined) continue;
     if (typeof input[key] !== 'boolean') throw new Error(`${key} 必须是布尔值`);
     result[key] = input[key];
   }
-  for (const key of ['edgeWidth', 'duration'] as const) {
+  for (const key of ['edgeWidth', 'duration', 'nodeSize'] as const) {
     const value = input[key];
     if (value === undefined) continue;
-    const max = key === 'edgeWidth' ? 5 : 2000;
+    const max = key === 'nodeSize' ? 96 : key === 'edgeWidth' ? 5 : 2000;
     if (
       typeof value !== 'number' ||
       !Number.isFinite(value) ||
-      value < (key === 'edgeWidth' ? 1 : 0) ||
+      value < (key === 'nodeSize' ? 32 : key === 'edgeWidth' ? 1 : 0) ||
       value > max
     )
       throw new Error(`${key} 超出允许范围`);
@@ -205,6 +237,9 @@ export function parseGraphDocument(input: unknown): GraphDocument {
       name: requireText(raw.name, '人物 name', 80),
       group: requireText(raw.group, '人物 group', 80),
       description: optionalText(raw.description, '人物 description'),
+      aliases: parseTextList(raw.aliases, 'aliases'),
+      tags: parseTextList(raw.tags, 'tags'),
+      attributes: parseAttributes(raw.attributes),
       chapter,
       position,
       placement,
@@ -308,4 +343,22 @@ export function getAllGroupPositions(
     });
   });
   return positions;
+}
+
+function parseTextList(value: unknown, field: string): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > 30)
+    throw new Error(`${field} 必须是最多 30 项的数组`);
+  return value.map((item) => requireText(item, field, 100));
+}
+function parseAttributes(value: unknown): Record<string, string> | undefined {
+  if (value === undefined) return undefined;
+  if (!isRecord(value) || Object.keys(value).length > 30)
+    throw new Error('attributes 必须是最多 30 项的对象');
+  return Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [
+      requireText(key, '属性名', 80),
+      requireText(item, '属性值', 500),
+    ]),
+  );
 }

@@ -81,6 +81,37 @@
                 "maximum": 100
               }
             }
+          },
+          "aliases": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          "tags": {
+            "type": "array",
+            "maxItems": 30,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            }
+          },
+          "attributes": {
+            "type": "object",
+            "maxProperties": 30,
+            "propertyNames": {
+              "minLength": 1,
+              "maxLength": 80
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
           }
         }
       }
@@ -184,6 +215,26 @@
         },
         "labels": {
           "enum": ["related", "all", "none"]
+        },
+        "nodeShape": {
+          "enum": ["ellipse", "round-rectangle", "diamond", "hexagon"]
+        },
+        "nodeSize": {
+          "type": "number",
+          "minimum": 32,
+          "maximum": 96
+        },
+        "nodeContent": {
+          "enum": ["name", "group", "description"]
+        },
+        "showAliases": {
+          "type": "boolean"
+        },
+        "showAttributes": {
+          "type": "boolean"
+        },
+        "showDescription": {
+          "type": "boolean"
         }
       }
     },

@@ -141,3 +141,7 @@ npm run build
 ## 可选 GitHub Actions
 
 自动检查模板位于 [docs/ci-workflow.yml](docs/ci-workflow.yml)。将其放到 .github/workflows/ci.yml 后可运行 npm ci、npm test 和 npm run build；当前仓库尚未启用该工作流。
+
+### v0.3 工作区
+
+增加双向思维导图、横向树、纵向树、同心圆和网格布局。左侧调整设置，中间查看图谱，右侧查看人物资料。西游记 26 人示例包含别名及身份、地点、兵器、经历等自定义资料。人物形状、大小、画布文字和详情字段均可设置，JSON 可导入导出。
