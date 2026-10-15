@@ -1,0 +1,830 @@
+{
+  "schemaVersion": 1,
+  "title": "西游记人物关系",
+  "maxChapter": 1,
+  "coreId": "wukong",
+  "characters": [
+    {
+      "id": "wukong",
+      "name": "孙悟空",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 0
+      },
+      "description": "唐僧的大徒弟，曾在菩提祖师门下学艺，保护唐僧西天取经。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "tangseng",
+      "name": "唐僧",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": -1
+      },
+      "description": "前往西天求取真经，是孙悟空、猪八戒和沙僧的师父。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": 0
+      }
+    },
+    {
+      "id": "bajie",
+      "name": "猪八戒",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 1
+      },
+      "description": "唐僧的二徒弟，与孙悟空、沙僧同行取经。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": 0
+      }
+    },
+    {
+      "id": "shaseng",
+      "name": "沙僧",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 2
+      },
+      "description": "在流沙河加入取经队伍，护送唐僧西行。",
+      "chapter": 1,
+      "position": {
+        "x": 420,
+        "y": 0
+      }
+    },
+    {
+      "id": "bailongma",
+      "name": "白龙马",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": -2
+      },
+      "description": "西海龙王之子，化为白马驮负唐僧西行。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": 0
+      }
+    },
+    {
+      "id": "puti",
+      "name": "菩提祖师",
+      "group": "神佛与仙人",
+      "placement": {
+        "level": -1,
+        "order": -2
+      },
+      "description": "孙悟空早年的授业师父，传授其变化与腾云之术。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": -190
+      }
+    },
+    {
+      "id": "guanyin",
+      "name": "观音菩萨",
+      "group": "神佛与仙人",
+      "placement": {
+        "level": -1,
+        "order": -1
+      },
+      "description": "参与安排取经事业，并多次帮助取经团队解难。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": -190
+      }
+    },
+    {
+      "id": "rulai",
+      "name": "如来佛祖",
+      "group": "神佛与仙人",
+      "placement": {
+        "level": -1,
+        "order": 0
+      },
+      "description": "曾将孙悟空压在五行山下，取经团队最终到达其所在的灵山。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": -190
+      }
+    },
+    {
+      "id": "yudi",
+      "name": "玉皇大帝",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": 0
+      },
+      "description": "天庭之主，曾招孙悟空入天庭任职，后来派兵征讨。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": -380
+      }
+    },
+    {
+      "id": "laojun",
+      "name": "太上老君",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": 1
+      },
+      "description": "孙悟空曾偷吃其金丹，并被投入八卦炉。青牛和金银二童与其有关。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": -380
+      }
+    },
+    {
+      "id": "taibai",
+      "name": "太白金星",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": -1
+      },
+      "description": "曾建议招安孙悟空，并向其传达天庭诏命。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": -380
+      }
+    },
+    {
+      "id": "erlang",
+      "name": "二郎神",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": -2
+      },
+      "description": "曾与孙悟空斗法，参与将其擒获。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": -380
+      }
+    },
+    {
+      "id": "donghai",
+      "name": "东海龙王",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": -3
+      },
+      "description": "孙悟空曾到其龙宫取得金箍棒。",
+      "chapter": 1,
+      "position": {
+        "x": -630,
+        "y": -380
+      }
+    },
+    {
+      "id": "zhenyuan",
+      "name": "镇元大仙",
+      "group": "神佛与仙人",
+      "placement": {
+        "level": -1,
+        "order": 1
+      },
+      "description": "五庄观之主，在人参果树风波后与孙悟空结为兄弟。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": -190
+      }
+    },
+    {
+      "id": "nezha",
+      "name": "哪吒",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": 2
+      },
+      "description": "曾奉天命与孙悟空交战，也在后来的降妖过程中提供帮助。",
+      "chapter": 1,
+      "position": {
+        "x": 420,
+        "y": -380
+      }
+    },
+    {
+      "id": "lijing",
+      "name": "托塔李天王",
+      "group": "天庭与龙宫",
+      "placement": {
+        "level": -2,
+        "order": 3
+      },
+      "description": "哪吒之父，曾率天兵征讨孙悟空。",
+      "chapter": 1,
+      "position": {
+        "x": 630,
+        "y": -380
+      }
+    },
+    {
+      "id": "niumowang",
+      "name": "牛魔王",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 1,
+        "order": -2
+      },
+      "description": "曾与孙悟空结义，后来在火焰山故事中与取经团队发生冲突。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": 190
+      }
+    },
+    {
+      "id": "tieshan",
+      "name": "铁扇公主",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 1,
+        "order": -1
+      },
+      "description": "牛魔王之妻、红孩儿之母，持有芭蕉扇。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": 190
+      }
+    },
+    {
+      "id": "honghaier",
+      "name": "红孩儿",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 1,
+        "order": 0
+      },
+      "description": "牛魔王与铁扇公主之子，后被观音收为善财童子。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": 190
+      }
+    },
+    {
+      "id": "baigujing",
+      "name": "白骨精",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 1,
+        "order": 1
+      },
+      "description": "以变化接近唐僧，被孙悟空识破。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": 190
+      }
+    },
+    {
+      "id": "huangfeng",
+      "name": "黄风怪",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 1,
+        "order": 2
+      },
+      "description": "在黄风岭阻挠取经，孙悟空为此求助降妖。",
+      "chapter": 1,
+      "position": {
+        "x": 420,
+        "y": 190
+      }
+    },
+    {
+      "id": "heixiong",
+      "name": "黑熊精",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 2,
+        "order": -2
+      },
+      "description": "盗取锦襕袈裟，后被观音收伏。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": 380
+      }
+    },
+    {
+      "id": "jinjiao",
+      "name": "金角大王",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 2,
+        "order": -1
+      },
+      "description": "平顶山妖王之一，与银角大王共同阻挠取经。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": 380
+      }
+    },
+    {
+      "id": "yinjiao",
+      "name": "银角大王",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 2,
+        "order": 0
+      },
+      "description": "平顶山妖王之一，与金角大王同为太上老君的童子。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": 380
+      }
+    },
+    {
+      "id": "qingniu",
+      "name": "青牛精",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 2,
+        "order": 1
+      },
+      "description": "太上老君的坐骑下界为妖，使用金刚琢对付取经团队。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": 380
+      }
+    },
+    {
+      "id": "liuer",
+      "name": "六耳猕猴",
+      "group": "妖怪与相关人物",
+      "placement": {
+        "level": 2,
+        "order": 2
+      },
+      "description": "假扮孙悟空，在真假美猴王故事中与其争斗。",
+      "chapter": 1,
+      "position": {
+        "x": 420,
+        "y": 380
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "r01",
+      "source": "tangseng",
+      "target": "wukong",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "唐僧收孙悟空为徒，孙悟空保护唐僧取经。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r02",
+      "source": "tangseng",
+      "target": "bajie",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "猪八戒拜唐僧为师，加入取经队伍。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r03",
+      "source": "tangseng",
+      "target": "shaseng",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "沙僧经点化后拜唐僧为师。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r04",
+      "source": "tangseng",
+      "target": "bailongma",
+      "label": "坐骑",
+      "type": "alliance",
+      "description": "白龙马化为白马，驮负唐僧西行。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r05",
+      "source": "wukong",
+      "target": "bajie",
+      "label": "同门",
+      "type": "alliance",
+      "description": "孙悟空与猪八戒同为唐僧弟子，协力取经。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r06",
+      "source": "wukong",
+      "target": "shaseng",
+      "label": "同门",
+      "type": "alliance",
+      "description": "孙悟空与沙僧共同护送唐僧。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r07",
+      "source": "bajie",
+      "target": "shaseng",
+      "label": "同门",
+      "type": "alliance",
+      "description": "猪八戒与沙僧是共同取经的师兄弟。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r08",
+      "source": "puti",
+      "target": "wukong",
+      "label": "授业",
+      "type": "mentorship",
+      "description": "菩提祖师传授孙悟空法术。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r09",
+      "source": "guanyin",
+      "target": "wukong",
+      "label": "帮助",
+      "type": "alliance",
+      "description": "观音多次回应孙悟空的求助，协助取经团队解难。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r10",
+      "source": "guanyin",
+      "target": "tangseng",
+      "label": "指引",
+      "type": "mentorship",
+      "description": "观音向唐僧指示西天取经之事。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r11",
+      "source": "rulai",
+      "target": "wukong",
+      "label": "镇压",
+      "type": "conflict",
+      "description": "大闹天宫之后，如来将孙悟空压在五行山下。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r12",
+      "source": "yudi",
+      "target": "wukong",
+      "label": "招安",
+      "type": "alliance",
+      "description": "玉帝曾授予孙悟空天庭官职。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r13",
+      "source": "yudi",
+      "target": "wukong",
+      "label": "征讨",
+      "type": "conflict",
+      "description": "孙悟空反出天庭后，玉帝派兵征讨。与招安发生在不同阶段。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r14",
+      "source": "taibai",
+      "target": "wukong",
+      "label": "招安使者",
+      "type": "alliance",
+      "description": "太白金星曾前往花果山招安孙悟空。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r15",
+      "source": "laojun",
+      "target": "wukong",
+      "label": "八卦炉炼化",
+      "type": "conflict",
+      "description": "太上老君曾将孙悟空投入八卦炉。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r16",
+      "source": "erlang",
+      "target": "wukong",
+      "label": "斗法",
+      "type": "conflict",
+      "description": "二郎神曾与孙悟空展开变化斗法。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r17",
+      "source": "donghai",
+      "target": "wukong",
+      "label": "取得金箍棒",
+      "type": "investigation",
+      "description": "孙悟空在东海龙宫取得如意金箍棒。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r18",
+      "source": "zhenyuan",
+      "target": "wukong",
+      "label": "结义",
+      "type": "friendship",
+      "description": "人参果树复生后，镇元大仙与孙悟空结为兄弟。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r19",
+      "source": "nezha",
+      "target": "wukong",
+      "label": "交战",
+      "type": "conflict",
+      "description": "哪吒曾奉命讨伐孙悟空。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r20",
+      "source": "lijing",
+      "target": "nezha",
+      "label": "父子",
+      "type": "family",
+      "description": "托塔李天王是哪吒的父亲。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r21",
+      "source": "yudi",
+      "target": "lijing",
+      "label": "统属",
+      "type": "alliance",
+      "description": "李天王受天庭调遣，率领天兵。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r22",
+      "source": "niumowang",
+      "target": "wukong",
+      "label": "结义旧交",
+      "type": "friendship",
+      "description": "牛魔王与孙悟空曾有结义交情。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r23",
+      "source": "niumowang",
+      "target": "wukong",
+      "label": "火焰山交战",
+      "type": "conflict",
+      "description": "火焰山借扇期间，牛魔王与孙悟空交战。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r24",
+      "source": "niumowang",
+      "target": "tieshan",
+      "label": "夫妻",
+      "type": "family",
+      "description": "牛魔王与铁扇公主为夫妻。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r25",
+      "source": "niumowang",
+      "target": "honghaier",
+      "label": "父子",
+      "type": "family",
+      "description": "牛魔王是红孩儿的父亲。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r26",
+      "source": "tieshan",
+      "target": "honghaier",
+      "label": "母子",
+      "type": "family",
+      "description": "铁扇公主是红孩儿的母亲。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r27",
+      "source": "wukong",
+      "target": "tieshan",
+      "label": "借芭蕉扇",
+      "type": "conflict",
+      "description": "孙悟空为过火焰山，向铁扇公主借扇。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r28",
+      "source": "wukong",
+      "target": "honghaier",
+      "label": "交战",
+      "type": "conflict",
+      "description": "孙悟空为救唐僧，与红孩儿交战。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r29",
+      "source": "guanyin",
+      "target": "honghaier",
+      "label": "收为童子",
+      "type": "mentorship",
+      "description": "观音收红孩儿为善财童子。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r30",
+      "source": "baigujing",
+      "target": "tangseng",
+      "label": "谋害",
+      "type": "conflict",
+      "description": "白骨精变化形貌，企图接近并谋害唐僧。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r31",
+      "source": "wukong",
+      "target": "baigujing",
+      "label": "识破并降妖",
+      "type": "conflict",
+      "description": "孙悟空识破白骨精的变化。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r32",
+      "source": "wukong",
+      "target": "huangfeng",
+      "label": "交战",
+      "type": "conflict",
+      "description": "孙悟空在黄风岭与黄风怪交战。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r33",
+      "source": "wukong",
+      "target": "heixiong",
+      "label": "追讨袈裟",
+      "type": "conflict",
+      "description": "孙悟空追讨被黑熊精盗走的袈裟。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r34",
+      "source": "guanyin",
+      "target": "heixiong",
+      "label": "收伏",
+      "type": "mentorship",
+      "description": "观音收伏黑熊精，令其守山。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r35",
+      "source": "jinjiao",
+      "target": "yinjiao",
+      "label": "同伴",
+      "type": "alliance",
+      "description": "金角大王与银角大王在平顶山共同为妖。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r36",
+      "source": "laojun",
+      "target": "jinjiao",
+      "label": "童子",
+      "type": "mentorship",
+      "description": "金角大王原是太上老君的童子。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r37",
+      "source": "laojun",
+      "target": "yinjiao",
+      "label": "童子",
+      "type": "mentorship",
+      "description": "银角大王原是太上老君的童子。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r38",
+      "source": "wukong",
+      "target": "jinjiao",
+      "label": "降妖",
+      "type": "conflict",
+      "description": "孙悟空在平顶山与金角大王斗法。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r39",
+      "source": "wukong",
+      "target": "yinjiao",
+      "label": "降妖",
+      "type": "conflict",
+      "description": "孙悟空在平顶山与银角大王斗法。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r40",
+      "source": "laojun",
+      "target": "qingniu",
+      "label": "坐骑",
+      "type": "alliance",
+      "description": "青牛精是太上老君的坐骑。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r41",
+      "source": "wukong",
+      "target": "qingniu",
+      "label": "交战",
+      "type": "conflict",
+      "description": "青牛精使用金刚琢与孙悟空等交战。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r42",
+      "source": "wukong",
+      "target": "liuer",
+      "label": "真假之争",
+      "type": "conflict",
+      "description": "六耳猕猴假扮孙悟空，双方争辨真假。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r43",
+      "source": "rulai",
+      "target": "liuer",
+      "label": "辨明身份",
+      "type": "investigation",
+      "description": "如来辨认出六耳猕猴的身份。",
+      "directed": true,
+      "fromChapter": 1
+    }
+  ]
+}

@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "title": "西游记人物关系",
+  "maxChapter": 1,
+  "coreId": "wukong",
+  "characters": [
+    {
+      "id": "wukong",
+      "name": "孙悟空",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 0
+      },
+      "description": "唐僧的大徒弟，曾在菩提祖师门下学艺，保护唐僧西天取经。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "tangseng",
+      "name": "唐僧",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": -1
+      },
+      "description": "前往西天求取真经，是孙悟空、猪八戒和沙僧的师父。",
+      "chapter": 1,
+      "position": {
+        "x": -210,
+        "y": 0
+      }
+    },
+    {
+      "id": "bajie",
+      "name": "猪八戒",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 1
+      },
+      "description": "唐僧的二徒弟，与孙悟空、沙僧同行取经。",
+      "chapter": 1,
+      "position": {
+        "x": 210,
+        "y": 0
+      }
+    },
+    {
+      "id": "shaseng",
+      "name": "沙僧",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 2
+      },
+      "description": "在流沙河加入取经队伍，护送唐僧西行。",
+      "chapter": 1,
+      "position": {
+        "x": 420,
+        "y": 0
+      }
+    },
+    {
+      "id": "bailongma",
+      "name": "白龙马",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": -2
+      },
+      "description": "西海龙王之子，化为白马驮负唐僧西行。",
+      "chapter": 1,
+      "position": {
+        "x": -420,
+        "y": 0
+      }
+    }
+  ],
+  "relations": [
+    {
+      "id": "r01",
+      "source": "tangseng",
+      "target": "wukong",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "唐僧收孙悟空为徒，孙悟空保护唐僧取经。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r02",
+      "source": "tangseng",
+      "target": "bajie",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "猪八戒拜唐僧为师，加入取经队伍。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r03",
+      "source": "tangseng",
+      "target": "shaseng",
+      "label": "师徒",
+      "type": "mentorship",
+      "description": "沙僧经点化后拜唐僧为师。",
+      "directed": true,
+      "fromChapter": 1
+    },
+    {
+      "id": "r04",
+      "source": "tangseng",
+      "target": "bailongma",
+      "label": "坐骑",
+      "type": "alliance",
+      "description": "白龙马化为白马，驮负唐僧西行。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r05",
+      "source": "wukong",
+      "target": "bajie",
+      "label": "同门",
+      "type": "alliance",
+      "description": "孙悟空与猪八戒同为唐僧弟子，协力取经。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r06",
+      "source": "wukong",
+      "target": "shaseng",
+      "label": "同门",
+      "type": "alliance",
+      "description": "孙悟空与沙僧共同护送唐僧。",
+      "directed": false,
+      "fromChapter": 1
+    },
+    {
+      "id": "r07",
+      "source": "bajie",
+      "target": "shaseng",
+      "label": "同门",
+      "type": "alliance",
+      "description": "猪八戒与沙僧是共同取经的师兄弟。",
+      "directed": false,
+      "fromChapter": 1
+    }
+  ]
+}

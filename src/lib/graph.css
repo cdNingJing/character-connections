@@ -1,0 +1,34 @@
+[data-character-graph] {
+  position: relative;
+  isolation: isolate;
+}
+[data-character-graph]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: var(--background-image);
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+}
+[data-character-graph]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-size: 24px 24px;
+  z-index: 0;
+}
+[data-character-graph][data-pattern='dots']::after {
+  background-image: radial-gradient(#8aaac333 0.9px, transparent 0.9px);
+}
+[data-character-graph][data-pattern='grid']::after {
+  background-image:
+    linear-gradient(#8aaac319 1px, transparent 1px),
+    linear-gradient(90deg, #8aaac319 1px, transparent 1px);
+}
+[data-character-graph] > div {
+  z-index: 1;
+}

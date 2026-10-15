@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "title": "西游记人物关系",
+  "maxChapter": 1,
+  "coreId": "wukong",
+  "characters": [
+    {
+      "id": "wukong",
+      "name": "孙悟空",
+      "group": "取经团队",
+      "placement": {
+        "level": 0,
+        "order": 0
+      },
+      "description": "唐僧的大徒弟，曾在菩提祖师门下学艺，保护唐僧西天取经。",
+      "chapter": 1,
+      "position": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "relations": []
+}
