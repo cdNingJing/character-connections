@@ -98,9 +98,9 @@ export function sampleQuadraticCurve(
   });
 }
 
-function countCurveObstacles(points: Point[], obstacles: Point[]): number {
+function countCurveObstacles(points: Point[], obstacles: Point[], radius = 55): number {
   return obstacles.filter((obstacle) =>
-    points.some((point) => Math.hypot(point.x - obstacle.x, point.y - obstacle.y) < 55),
+    points.some((point) => Math.hypot(point.x - obstacle.x, point.y - obstacle.y) < radius),
   ).length;
 }
 
@@ -135,6 +135,8 @@ export function sampleCurveRoute(
 export function getAllCurveRoutes(
   document: GraphDocument,
   positions: Map<string, Point>,
+  curvature = 1,
+  obstacleRadius = 55,
 ): Map<string, CurveRoute> {
   const routes = new Map<string, CurveRoute>();
   const usedLanes = new Map<string, Set<number>>();
@@ -152,10 +154,14 @@ export function getAllCurveRoutes(
     let bestScore = Infinity;
     for (const canonical of [
       44, -44, 88, -88, 140, -140, 210, -210, 310, -310, 440, -440, 620, -620,
-    ]) {
+    ].map((value) => value * curvature)) {
       if (lanes.has(canonical)) continue;
       const distance = canonical * direction;
-      const hits = countCurveObstacles(sampleQuadraticCurve(start, end, distance), obstacles);
+      const hits = countCurveObstacles(
+        sampleQuadraticCurve(start, end, distance),
+        obstacles,
+        obstacleRadius,
+      );
       const score = hits * 100000 + Math.abs(distance);
       if (score < bestScore) {
         bestScore = score;
@@ -179,18 +185,24 @@ export function getAllCurveRoutes(
         obstacleCount: countCurveObstacles(
           sampleQuadraticCurve(start, end, canonical * direction),
           obstacles,
+          obstacleRadius,
         ),
       };
     }
     if (best.obstacleCount > 0) {
-      for (const first of [88, -88, 140, -140, 210, -210, 310, -310, 440, -440]) {
+      for (const first of [88, -88, 140, -140, 210, -210, 310, -310, 440, -440].map(
+        (value) => value * curvature,
+      )) {
         if (lanes.has(first)) continue;
-        for (const second of [88, -88, 140, -140, 210, -210, 310, -310, 440, -440]) {
+        for (const second of [88, -88, 140, -140, 210, -210, 310, -310, 440, -440].map(
+          (value) => value * curvature,
+        )) {
           const distances = [first * direction, second * direction];
           const weights = [0.25, 0.75];
           const hits = countCurveObstacles(
             sampleCurveRoute(start, end, distances, weights),
             obstacles,
+            obstacleRadius,
           );
           const score = hits * 100000 + (Math.abs(first) + Math.abs(second)) * 0.6;
           if (score < bestScore) {

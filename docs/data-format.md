@@ -94,3 +94,11 @@
 人物支持 `aliases: string[]`、`tags: string[]` 和 `attributes: Record<string, string>`。自定义资料以键值显示在详情区，导入导出会保留。文字作为纯文本显示。
 
 `appearance.nodeShape` 支持 ellipse、round-rectangle、diamond、hexagon；`nodeSize` 为 32–96；`nodeContent` 为 name、group、description。`showAliases`、`showAttributes`、`showDescription` 控制详情内容。
+
+## 连线与文字设置
+
+`edgeShape` 支持 `bezier`（自动绕行）、`soft-bezier`（平缓曲线）、`arc`（弧形曲线）、`round-taxi`（自动圆角折线）、`horizontal-taxi`、`vertical-taxi`、`round-segments` 和 `straight`。`edgeCurvature` 为 0.4–2 倍；`edgeCornerRadius` 为 0–80。圆角与弯曲参数只作用于对应路径。折线按方向分流，不保证绕开所有节点。
+
+`labelFontSize` 为 10–20，`labelMaxWidth` 为 60–240，`labelOffset` 为 -30–30，单位为画布坐标 px。选中的关系在缩小时保持最低可读字号。`labelBackground` 为 `pill` / `plain` / `none`；`labelDirection` 为 `horizontal` / `along-edge`；`labelPosition` 为 `auto` / `middle` / `source` / `target`。`labels: focused` 只显示选中的单条关系。
+
+`avoidLabelOverlap` 默认开启，以确定性候选位置尽量避开人物和其他可见文字；密集图无法保证没有重叠，沿线旋转后的碰撞判断采用近似边界。自动避让可能使文字稍微偏离指定位置；精确放置时可关闭。所有设置均包含在导出 JSON 的 `appearance` 中，旧 JSON 自动补齐默认设置。

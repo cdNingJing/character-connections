@@ -189,7 +189,16 @@
           "pattern": "^$|^data:image/(png|jpeg|webp);base64,[a-zA-Z0-9+/=]+$"
         },
         "edgeShape": {
-          "enum": ["bezier", "straight", "round-taxi"]
+          "enum": [
+            "bezier",
+            "soft-bezier",
+            "arc",
+            "round-taxi",
+            "horizontal-taxi",
+            "vertical-taxi",
+            "round-segments",
+            "straight"
+          ]
         },
         "edgeLine": {
           "enum": ["solid", "dashed", "dotted"]
@@ -214,7 +223,7 @@
           "maximum": 2000
         },
         "labels": {
-          "enum": ["related", "all", "none"]
+          "enum": ["related", "all", "focused", "none"]
         },
         "nodeShape": {
           "enum": ["ellipse", "round-rectangle", "diamond", "hexagon"]
@@ -234,6 +243,43 @@
           "type": "boolean"
         },
         "showDescription": {
+          "type": "boolean"
+        },
+        "edgeCurvature": {
+          "type": "number",
+          "minimum": 0.4,
+          "maximum": 2
+        },
+        "edgeCornerRadius": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 80
+        },
+        "labelFontSize": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 20
+        },
+        "labelMaxWidth": {
+          "type": "number",
+          "minimum": 60,
+          "maximum": 240
+        },
+        "labelOffset": {
+          "type": "number",
+          "minimum": -30,
+          "maximum": 30
+        },
+        "labelBackground": {
+          "enum": ["pill", "plain", "none"]
+        },
+        "labelDirection": {
+          "enum": ["horizontal", "along-edge"]
+        },
+        "labelPosition": {
+          "enum": ["auto", "middle", "source", "target"]
+        },
+        "avoidLabelOverlap": {
           "type": "boolean"
         }
       }

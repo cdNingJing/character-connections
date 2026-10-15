@@ -173,6 +173,15 @@ const optionFields: Record<string, keyof GraphOptions> = {
   'background-color': 'background',
   pattern: 'pattern',
   'edge-shape': 'edgeShape',
+  'edge-curvature': 'edgeCurvature',
+  'edge-corner-radius': 'edgeCornerRadius',
+  'label-font-size': 'labelFontSize',
+  'label-max-width': 'labelMaxWidth',
+  'label-offset': 'labelOffset',
+  'label-background': 'labelBackground',
+  'label-direction': 'labelDirection',
+  'label-position': 'labelPosition',
+  'avoid-label-overlap': 'avoidLabelOverlap',
   'edge-line': 'edgeLine',
   'edge-width': 'edgeWidth',
   'edge-color': 'edgeColor',
@@ -190,16 +199,33 @@ function syncOptionFields(): void {
       field.checked = Boolean(graph.options[key]);
     else field.value = String(graph.options[key]);
   }
+  for (const [id, key] of Object.entries(optionFields)) {
+    const output = document.getElementById(`${id}-label`);
+    if (
+      output &&
+      [
+        'edgeCurvature',
+        'edgeCornerRadius',
+        'labelFontSize',
+        'labelMaxWidth',
+        'labelOffset',
+      ].includes(key)
+    )
+      output.textContent = String(graph.options[key]) + (key === 'edgeCurvature' ? ' 倍' : ' px');
+  }
+  const curved = ['bezier', 'soft-bezier', 'arc'].includes(graph.options.edgeShape);
+  $<HTMLInputElement>('edge-curvature').disabled = !curved;
+  $<HTMLInputElement>('edge-corner-radius').disabled =
+    curved || graph.options.edgeShape === 'straight';
   $('edge-width-label').textContent = `${graph.options.edgeWidth} px`;
   $('duration-label').textContent = `${graph.options.duration} ms`;
   $('background-file-label').textContent = graph.options.backgroundImage
     ? '已设置背景图片'
     : '未设置图片';
   $('remove-background').hidden = !graph.options.backgroundImage;
-  $('edge-help').textContent =
-    graph.options.edgeShape === 'bezier'
-      ? '同一对人物的多条关系使用曲线分开显示。'
-      : '直线和折线可能重叠；查看多条平行关系时请使用曲线。';
+  $('edge-help').textContent = curved
+    ? '曲线自动分开同一对人物的多条关系，并尽量绕开人物。'
+    : '圆角折线适合树形和思维导图；复杂交叉关系建议使用自动绕行曲线。';
 }
 
 for (const [id, key] of Object.entries(optionFields)) {
@@ -212,7 +238,16 @@ for (const [id, key] of Object.entries(optionFields)) {
       const value =
         field instanceof HTMLInputElement && field.type === 'checkbox'
           ? field.checked
-          : ['edgeWidth', 'duration', 'nodeSize'].includes(key)
+          : [
+                'edgeWidth',
+                'duration',
+                'nodeSize',
+                'edgeCurvature',
+                'edgeCornerRadius',
+                'labelFontSize',
+                'labelMaxWidth',
+                'labelOffset',
+              ].includes(key)
             ? Number(field.value)
             : field.value;
       graph.applyAppearanceOptions({ [key]: value });

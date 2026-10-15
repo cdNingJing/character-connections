@@ -1,4 +1,5 @@
 import cytoscape from 'cytoscape';
+import { getAllNonOverlappingLabelPositions, getPointAlongPolyline } from './edge-labels';
 import { getAllStructuredPositions, getAllRootedBranches } from './structured-layout';
 import './graph.css';
 import type {
@@ -68,9 +69,13 @@ export class CharacterGraph {
       if (event.target === this.core) this.clearSelection();
     });
     this.core.on('zoom', () => {
+      this.updateAllRelationLabelPositions();
       this.core.style().update();
     });
-    this.core.on('dragfree', 'node', () => this.updateAllCurveRoutes());
+    this.core.on('dragfree', 'node', () => {
+      this.updateAllCurveRoutes();
+      this.updateAllRelationLabelPositions();
+    });
     this.resizeObserver = new ResizeObserver(() => {
       this.core.resize();
       this.fit();
@@ -163,7 +168,16 @@ export class CharacterGraph {
     const positions = new Map(
       this.core.nodes().map((node) => [node.id(), { ...node.position() }] as const),
     );
-    const routes = getAllCurveRoutes(this.document, positions);
+    const strength =
+      this.options.edgeShape === 'soft-bezier' ? 0.65 : this.options.edgeShape === 'arc' ? 1.6 : 1;
+    const radius =
+      this.options.nodeSize * (this.options.nodeShape === 'round-rectangle' ? 0.95 : 0.5) + 10;
+    const routes = getAllCurveRoutes(
+      this.document,
+      positions,
+      this.options.edgeCurvature * strength,
+      radius,
+    );
     this.core.batch(() => {
       this.core.edges().forEach((edge) => {
         const route = routes.get(edge.id())!;
@@ -171,20 +185,6 @@ export class CharacterGraph {
         edge.data('routeDistances', route.distances.join(' '));
         edge.data('routeWeights', route.weights.join(' '));
         edge.data('routeObstacleCount', route.obstacleCount);
-        const coreId = findCoreCharacterId(this.document);
-        const ratio =
-          edge.data('source') === coreId ? 0.68 : edge.data('target') === coreId ? 0.32 : 0.5;
-        const points = sampleCurveRoute(
-          positions.get(edge.data('source'))!,
-          positions.get(edge.data('target'))!,
-          route.distances,
-          route.weights,
-          100,
-        );
-        const middle = points[Math.floor((points.length - 1) / 2)],
-          label = points[Math.round(ratio * (points.length - 1))];
-        edge.data('labelOffsetX', label.x - middle.x);
-        edge.data('labelOffsetY', label.y - middle.y);
       });
     });
   }
@@ -192,6 +192,7 @@ export class CharacterGraph {
   applyAppearanceOptions(options: Partial<GraphOptions> = {}): void {
     this.options = parseGraphOptions({ ...this.options, ...options });
     const settings = this.options;
+    this.updateAllCurveRoutes();
     this.host.style.backgroundColor = settings.background;
     this.host.dataset.pattern = settings.pattern;
     this.host.style.setProperty(
@@ -251,20 +252,53 @@ export class CharacterGraph {
           'target-arrow-shape': 'none',
           'arrow-scale': 0.8,
           'line-style': settings.edgeLine,
-          'curve-style': settings.edgeShape === 'bezier' ? 'unbundled-bezier' : settings.edgeShape,
+          'curve-style': ['bezier', 'soft-bezier', 'arc'].includes(settings.edgeShape)
+            ? 'unbundled-bezier'
+            : ['horizontal-taxi', 'vertical-taxi'].includes(settings.edgeShape)
+              ? 'round-taxi'
+              : settings.edgeShape === 'straight'
+                ? 'straight'
+                : settings.edgeShape === 'round-segments'
+                  ? 'round-segments'
+                  : 'round-taxi',
+          'line-cap': 'round',
+          'taxi-direction':
+            settings.edgeShape === 'horizontal-taxi'
+              ? 'horizontal'
+              : settings.edgeShape === 'vertical-taxi'
+                ? 'vertical'
+                : 'auto',
+          'taxi-turn': (edge: EdgeSingular) =>
+            `${Math.max(20, Math.min(80, 50 + edge.data('routeDistance') / 12))}%`,
+          'taxi-radius': settings.edgeCornerRadius,
+          'taxi-turn-min-distance': 24,
+          'segment-distances': 'data(routeDistances)',
+          'segment-weights': 'data(routeWeights)',
+          'segment-radii': [settings.edgeCornerRadius],
           'control-point-step-size': 65,
           'control-point-distances': 'data(routeDistances)',
           'control-point-weights': 'data(routeWeights)',
           'edge-distances': 'node-position',
           label: settings.labels === 'all' ? 'data(label)' : '',
           color: textColor,
-          'font-size': 12,
+          'font-size': (edge: EdgeSingular) =>
+            settings.labels === 'all'
+              ? Math.max(settings.labelFontSize, 10 / edge.cy().zoom())
+              : settings.labelFontSize,
           'text-background-color': settings.background,
-          'text-background-opacity': 0.95,
-          'text-background-padding': '4px',
-          'text-rotation': 'none',
-          'text-margin-x': (edge: EdgeSingular) => edge.data('labelOffsetX'),
-          'text-margin-y': (edge: EdgeSingular) => edge.data('labelOffsetY'),
+          'text-background-opacity': settings.labelBackground === 'none' ? 0 : 0.96,
+          'text-background-shape':
+            settings.labelBackground === 'pill' ? 'roundrectangle' : 'rectangle',
+          'text-background-padding': '5px',
+          'text-border-width': settings.labelBackground === 'pill' ? 0.6 : 0,
+          'text-border-color': isLight ? '#b3c4d0' : '#476477',
+          'text-border-opacity': 0.6,
+          'text-wrap': 'wrap',
+          'text-overflow-wrap': 'anywhere',
+          'text-max-width': `${settings.labelMaxWidth}px`,
+          'text-rotation': settings.labelDirection === 'along-edge' ? 'autorotate' : 'none',
+          'text-margin-x': (edge: EdgeSingular) => Number(edge.data('labelOffsetX')) || 0,
+          'text-margin-y': (edge: EdgeSingular) => Number(edge.data('labelOffsetY')) || 0,
           'min-zoomed-font-size': 9,
           'transition-property':
             settings.transition === 'fade' ? 'opacity' : 'opacity, line-color, width',
@@ -278,6 +312,13 @@ export class CharacterGraph {
       },
       { selector: 'edge.cross-branch', css: { opacity: 0.2, 'line-style': 'dotted' } },
       { selector: '.dimmed', css: { opacity: 0.13, label: '' } },
+      {
+        selector: 'edge.dimmed',
+        css: {
+          opacity: settings.labels === 'all' ? 0.55 : 0.13,
+          label: settings.labels === 'all' ? 'data(label)' : '',
+        },
+      },
       {
         selector: 'node.dimmed',
         css: { opacity: 0.5, label: (node: NodeSingular) => this.getCharacterLabel(node) },
@@ -299,11 +340,14 @@ export class CharacterGraph {
         css: {
           width: settings.edgeWidth + 1.1,
           label: (edge: EdgeSingular) =>
-            settings.labels === 'none' || (settings.labels === 'related' && edge.cy().zoom() < 0.45)
+            settings.labels === 'none' ||
+            settings.labels === 'focused' ||
+            (settings.labels === 'related' && edge.cy().zoom() < 0.45)
               ? ''
               : edge.data('label'),
           opacity: 1,
-          'font-size': (edge: EdgeSingular) => Math.max(12, 10 / edge.cy().zoom()),
+          'font-size': (edge: EdgeSingular) =>
+            Math.max(settings.labelFontSize, settings.labelFontSize / edge.cy().zoom()),
           'min-zoomed-font-size': 0,
         },
       },
@@ -312,6 +356,9 @@ export class CharacterGraph {
         css: {
           width: settings.edgeWidth + 2,
           label: settings.labels === 'none' ? '' : 'data(label)',
+          'font-size': (edge: EdgeSingular) =>
+            Math.max(settings.labelFontSize, settings.labelFontSize / edge.cy().zoom()),
+          'min-zoomed-font-size': 0,
           opacity: 1,
         },
       },
@@ -339,6 +386,90 @@ export class CharacterGraph {
     ];
     this.core.style(styles);
     this.updateSelectionStyles();
+  }
+
+  private updateAllRelationLabelPositions(): void {
+    const settings = this.options;
+    const zoom = this.core.zoom();
+    const edges = this.core
+      .edges()
+      .filter(
+        (edge) =>
+          !edge.hasClass('unrevealed') &&
+          (settings.labels === 'all' ||
+            (settings.labels === 'related' && edge.hasClass('related') && zoom >= 0.45) ||
+            (settings.labels !== 'none' && edge.hasClass('focused'))),
+      );
+    const inputs = edges.map((item) => {
+      const edge = item as EdgeSingular;
+      const middle = edge.midpoint();
+      const a = edge.source().position(),
+        b = edge.target().position();
+      const size = edge.hasClass('related')
+        ? Math.max(settings.labelFontSize, settings.labelFontSize / zoom)
+        : settings.labels === 'all'
+          ? Math.max(settings.labelFontSize, 10 / zoom)
+          : settings.labelFontSize;
+      const textWidth = Math.min(settings.labelMaxWidth, String(edge.data('label')).length * size);
+      const height =
+        Math.ceil((String(edge.data('label')).length * size) / settings.labelMaxWidth) *
+          size *
+          1.3 +
+        12;
+      const base =
+        settings.labelPosition === 'source' ? 0.3 : settings.labelPosition === 'target' ? 0.7 : 0.5;
+      const coreId = findCoreCharacterId(this.document);
+      const preferred =
+        edge.source().id() === coreId ? 0.68 : edge.target().id() === coreId ? 0.32 : 0.5;
+      const ratios =
+        settings.labelPosition === 'auto' ? [preferred, 0.5, 0.35, 0.65, 0.25, 0.75] : [base];
+      const curved = ['bezier', 'soft-bezier', 'arc'].includes(settings.edgeShape);
+      const points = curved
+        ? sampleCurveRoute(
+            a,
+            b,
+            String(edge.data('routeDistances')).split(' ').map(Number),
+            String(edge.data('routeWeights')).split(' ').map(Number),
+            60,
+          )
+        : [];
+      const segments = edge.segmentPoints();
+      const polyline = [edge.sourceEndpoint(), ...(segments ?? [middle]), edge.targetEndpoint()];
+      const candidates = ratios.flatMap((ratio) => {
+        const point = curved
+          ? points[Math.round((points.length - 1) * ratio)]
+          : ratio === 0.5
+            ? middle
+            : getPointAlongPolyline(polyline, ratio);
+        const shifts = settings.avoidLabelOverlap ? [0, -18, 18, -36, 36] : [0];
+        return shifts.map((shift) => ({ x: point.x, y: point.y + settings.labelOffset + shift }));
+      });
+      return { id: edge.id(), width: textWidth + 14, height, candidates };
+    });
+    const obstacles = this.core
+      .nodes()
+      .not('.unrevealed')
+      .map((item) => {
+        const node = item as NodeSingular;
+        return {
+          x: node.position('x'),
+          y: node.position('y'),
+          width: node.width() + 16,
+          height: node.height() + 16,
+        };
+      });
+    const placements = getAllNonOverlappingLabelPositions(
+      inputs,
+      settings.avoidLabelOverlap ? obstacles : [],
+    );
+    this.core.batch(() =>
+      this.core.edges().forEach((edge) => {
+        const middle = edge.midpoint(),
+          point = placements.get(edge.id());
+        edge.data('labelOffsetX', point ? point.x - middle.x : 0);
+        edge.data('labelOffsetY', point ? point.y - middle.y : settings.labelOffset);
+      }),
+    );
   }
 
   private getCharacterLabel(node: NodeSingular): string {
@@ -423,6 +554,7 @@ export class CharacterGraph {
       related.nodes().not(element).addClass('neighbor');
       related.edges().addClass('related');
     });
+    this.updateAllRelationLabelPositions();
   }
 
   applyLayout(name: LayoutName): void {
@@ -466,6 +598,7 @@ export class CharacterGraph {
       this.pendingFit = setTimeout(
         () => {
           this.updateAllCurveRoutes();
+          this.updateAllRelationLabelPositions();
           this.fit();
         },
         animate ? this.options.duration + 30 : 0,
@@ -487,6 +620,7 @@ export class CharacterGraph {
           };
     visible.layout(options).run();
     this.updateAllCurveRoutes();
+    this.updateAllRelationLabelPositions();
     this.fit();
   }
 

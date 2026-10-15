@@ -43,7 +43,15 @@ export type LayoutName =
   | 'horizontal-tree'
   | 'radial'
   | 'grid';
-export type EdgeShape = 'bezier' | 'straight' | 'round-taxi';
+export type EdgeShape =
+  | 'bezier'
+  | 'soft-bezier'
+  | 'arc'
+  | 'round-taxi'
+  | 'horizontal-taxi'
+  | 'vertical-taxi'
+  | 'round-segments'
+  | 'straight';
 export type TransitionName = 'none' | 'smooth' | 'fade';
 
 export interface GraphOptions {
@@ -59,11 +67,20 @@ export interface GraphOptions {
   edgeShape: EdgeShape;
   edgeLine: 'solid' | 'dashed' | 'dotted';
   edgeWidth: number;
+  edgeCurvature: number;
+  edgeCornerRadius: number;
+  labelFontSize: number;
+  labelMaxWidth: number;
+  labelOffset: number;
+  labelBackground: 'pill' | 'plain' | 'none';
+  labelDirection: 'horizontal' | 'along-edge';
+  labelPosition: 'auto' | 'middle' | 'source' | 'target';
+  avoidLabelOverlap: boolean;
   edgeColor: string;
   unifiedEdgeColor: boolean;
   transition: TransitionName;
   duration: number;
-  labels: 'related' | 'all' | 'none';
+  labels: 'related' | 'all' | 'focused' | 'none';
   arrows: boolean;
 }
 
@@ -80,6 +97,15 @@ export const DEFAULT_OPTIONS: GraphOptions = {
   edgeShape: 'bezier',
   edgeLine: 'solid',
   edgeWidth: 1.6,
+  edgeCurvature: 1,
+  edgeCornerRadius: 24,
+  labelFontSize: 12,
+  labelMaxWidth: 110,
+  labelOffset: 8,
+  labelBackground: 'pill',
+  labelDirection: 'horizontal',
+  labelPosition: 'auto',
+  avoidLabelOverlap: true,
   edgeColor: '#8faabd',
   unifiedEdgeColor: false,
   transition: 'smooth',
@@ -114,10 +140,22 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     nodeShape: ['ellipse', 'round-rectangle', 'diamond', 'hexagon'],
     nodeContent: ['name', 'group', 'description'],
     pattern: ['dots', 'grid', 'none'],
-    edgeShape: ['bezier', 'straight', 'round-taxi'],
+    edgeShape: [
+      'bezier',
+      'soft-bezier',
+      'arc',
+      'round-taxi',
+      'horizontal-taxi',
+      'vertical-taxi',
+      'round-segments',
+      'straight',
+    ],
     edgeLine: ['solid', 'dashed', 'dotted'],
     transition: ['none', 'smooth', 'fade'],
-    labels: ['related', 'all', 'none'],
+    labels: ['related', 'all', 'focused', 'none'],
+    labelBackground: ['pill', 'plain', 'none'],
+    labelDirection: ['horizontal', 'along-edge'],
+    labelPosition: ['auto', 'middle', 'source', 'target'],
   } as const;
   for (const key of Object.keys(choices) as (keyof typeof choices)[]) {
     const value = input[key];
@@ -129,6 +167,7 @@ export function parseGraphOptions(input: unknown): GraphOptions {
   for (const key of [
     'unifiedEdgeColor',
     'arrows',
+    'avoidLabelOverlap',
     'showAliases',
     'showAttributes',
     'showDescription',
@@ -137,17 +176,22 @@ export function parseGraphOptions(input: unknown): GraphOptions {
     if (typeof input[key] !== 'boolean') throw new Error(`${key} 必须是布尔值`);
     result[key] = input[key];
   }
-  for (const key of ['edgeWidth', 'duration', 'nodeSize'] as const) {
+  const numberRanges = {
+    edgeWidth: [1, 5],
+    duration: [0, 2000],
+    nodeSize: [32, 96],
+    edgeCurvature: [0.4, 2],
+    edgeCornerRadius: [0, 80],
+    labelFontSize: [10, 20],
+    labelMaxWidth: [60, 240],
+    labelOffset: [-30, 30],
+  } as const;
+  for (const key of Object.keys(numberRanges) as (keyof typeof numberRanges)[]) {
     const value = input[key];
     if (value === undefined) continue;
-    const max = key === 'nodeSize' ? 96 : key === 'edgeWidth' ? 5 : 2000;
-    if (
-      typeof value !== 'number' ||
-      !Number.isFinite(value) ||
-      value < (key === 'nodeSize' ? 32 : key === 'edgeWidth' ? 1 : 0) ||
-      value > max
-    )
-      throw new Error(`${key} 超出允许范围`);
+    const [min, max] = numberRanges[key];
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < min || value > max)
+      throw new Error(`${key} 超出允许范围 ${min}—${max}`);
     result[key] = value;
   }
   if (input.backgroundImage !== undefined) {

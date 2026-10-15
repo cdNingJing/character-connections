@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <span class="version">v0.3.0 · MIT</span
+        <span class="version">v0.4.0 · MIT</span
         ><button id="import-button" class="secondary">导入 JSON</button
         ><button id="export-button" class="primary">导出 JSON</button>
       </div>
@@ -212,13 +212,27 @@
         <details class="setting-section" open>
           <summary>连线与文字</summary>
           <div class="setting-content">
+            <h3 class="control-group-title">连线路径</h3>
             <label class="field"
               >连线形状<select id="edge-shape">
-                <option value="bezier">曲线（绕开人物、分开多条关系）</option>
+                <option value="bezier">自动绕行曲线</option>
+                <option value="soft-bezier">平缓曲线</option>
+                <option value="arc">弧形曲线</option>
+                <option value="round-taxi">自动圆角折线</option>
+                <option value="horizontal-taxi">横向圆角折线</option>
+                <option value="vertical-taxi">纵向圆角折线</option>
+                <option value="round-segments">圆角分段线</option>
                 <option value="straight">直线</option>
-                <option value="round-taxi">圆角折线</option>
               </select></label
             >
+            <label class="range-field"
+              ><span>曲线弯曲程度 <output id="edge-curvature-label"></output></span
+              ><input id="edge-curvature" type="range" min="0.4" max="2" step="0.1"
+            /></label>
+            <label class="range-field"
+              ><span>折线圆角 <output id="edge-corner-radius-label"></output></span
+              ><input id="edge-corner-radius" type="range" min="0" max="80" step="2"
+            /></label>
             <label class="field"
               >线条样式<select id="edge-line">
                 <option value="solid">实线</option>
@@ -236,13 +250,57 @@
             <label class="color-field" for="edge-color"
               >自定义连线颜色<input type="color" id="edge-color" value="#8faabd"
             /></label>
+            <h3 class="control-group-title">关系文字</h3>
             <label class="field"
               >关系文字<select id="labels">
                 <option value="related">只显示选中人物的关系</option>
                 <option value="all">显示全部关系文字</option>
+                <option value="focused">只显示选中的一条关系</option>
                 <option value="none">不显示关系文字</option>
               </select></label
             >
+            <details class="label-options">
+              <summary>文字样式与位置</summary>
+              <div class="setting-content">
+                <label class="range-field"
+                  ><span>文字大小 <output id="label-font-size-label"></output></span
+                  ><input id="label-font-size" type="range" min="10" max="20" step="1"
+                /></label>
+                <label class="range-field"
+                  ><span>换行宽度 <output id="label-max-width-label"></output></span
+                  ><input id="label-max-width" type="range" min="60" max="240" step="10"
+                /></label>
+                <label class="field"
+                  >文字底色<select id="label-background">
+                    <option value="pill">圆角底色与描边</option>
+                    <option value="plain">矩形底色</option>
+                    <option value="none">无底色</option>
+                  </select></label
+                >
+                <label class="field"
+                  >文字方向<select id="label-direction">
+                    <option value="horizontal">保持水平</option>
+                    <option value="along-edge">沿连线方向</option>
+                  </select></label
+                >
+                <label class="field"
+                  >文字位置<select id="label-position">
+                    <option value="auto">自动分散</option>
+                    <option value="middle">连线中间</option>
+                    <option value="source">靠近起点</option>
+                    <option value="target">靠近终点</option>
+                  </select></label
+                >
+                <label class="range-field"
+                  ><span>文字上下偏移 <output id="label-offset-label"></output></span
+                  ><input id="label-offset" type="range" min="-30" max="30" step="2"
+                /></label>
+                <label class="check-field"
+                  ><input id="avoid-label-overlap" type="checkbox" />自动错开文字</label
+                >
+                <p class="field-help">密集关系中会尽量错开文字，放大或选择单条关系可看得更清楚。</p>
+              </div>
+            </details>
             <label class="check-field"
               ><input type="checkbox" id="arrows" checked />显示有方向关系的箭头</label
             >
