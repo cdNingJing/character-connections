@@ -696,3 +696,156 @@ dialog li {
 .cross-group-toggle input {
   accent-color: var(--accent);
 }
+
+.presentation-switch {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 12px 14px;
+  background: #f8fafb;
+  border-top: 1px solid var(--line);
+}
+.presentation-switch button {
+  font-size: 11px;
+}
+.presentation-switch button[aria-pressed='true'] {
+  background: #e3efeb;
+  color: #17665f;
+  border-color: #91b5a8;
+}
+#example-notebook {
+  width: 100%;
+}
+body[data-paper-mode='true'] .parameters-panel {
+  max-height: 700px;
+}
+body[data-paper-mode='true'] .layout-explanation::after {
+  content: ' A4 笔记按分组或关系层次整理人物，长线改为独立关系行；完整空间布局可切换到交互图谱。';
+}
+@media print {
+  .docs-header,
+  .docs-sidebar,
+  .parameters-panel,
+  .example-heading,
+  .layout-explanation,
+  .source-panel,
+  .docs-main > footer,
+  .preview-heading,
+  .cross-group-toggle,
+  .presentation-switch,
+  #selection-detail,
+  #example-graph {
+    display: none !important;
+  }
+  .docs-layout,
+  .docs-main,
+  .example-workspace,
+  .preview-panel {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    max-width: none !important;
+    overflow: visible !important;
+  }
+  #example-notebook {
+    display: block !important;
+  }
+}
+
+body[data-paper-mode='true'] .appearance-group,
+body[data-paper-mode='true'] #example-core,
+body[data-paper-mode='true'] label:has(> #example-core) {
+  display: none;
+}
+.paper-format-note {
+  display: none;
+  font-size: 12px;
+  line-height: 1.9;
+  padding: 14px;
+  background: #edf4f2;
+  color: #4c6e70;
+  border-radius: 6px;
+  margin-top: 16px;
+}
+body[data-paper-mode='true'] .paper-format-note {
+  display: block;
+}
+@page {
+  size: A4;
+  margin: 0;
+}
+body[data-paper-mode='true'] #zoom-in-example,
+body[data-paper-mode='true'] #zoom-out-example,
+body[data-paper-mode='true'] #fit-example {
+  display: none;
+}
+
+.sidebar-view-switch {
+  display: grid;
+  padding: 0 0 20px;
+  background: none;
+  border: 0;
+}
+.sidebar-view-switch button {
+  text-align: left;
+  font-size: 13px;
+  padding: 12px;
+}
+#profile-navigation button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 10px 12px;
+  color: #36515b;
+}
+#profile-navigation button small {
+  display: block;
+  font-size: 10px;
+  color: #7c8f96;
+  margin-top: 4px;
+}
+#profile-navigation button[aria-current='page'] {
+  background: #e3efeb;
+  border-radius: 5px;
+  color: #17665f;
+}
+body[data-paper-mode='true'] .graph-layout-label,
+body[data-paper-mode='true'] .cross-group-toggle,
+body[data-paper-mode='true'] #selection-detail,
+body[data-paper-mode='true'] #clear-selection,
+body[data-paper-mode='true'] .parameter-note,
+body[data-paper-mode='true'] label:has(> #example-stage) {
+  display: none;
+}
+body[data-paper-mode='true'] .layout-explanation::after {
+  content: none;
+}
+#print-notebook {
+  margin: 10px 14px;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .sidebar-view-switch {
+    display: flex;
+  }
+  #profile-navigation .nav-group {
+    display: flex;
+    overflow-x: auto;
+  }
+  #profile-navigation .nav-group h2 {
+    display: none;
+  }
+  #profile-navigation button {
+    width: auto;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+}
+@media print {
+  #print-notebook {
+    display: none;
+  }
+}

@@ -28,10 +28,16 @@
     </header>
     <div class="docs-layout">
       <aside class="docs-sidebar">
-        <p class="sidebar-label">按布局查看示例</p>
+        <p class="sidebar-label">查看方式</p>
+        <div class="presentation-switch sidebar-view-switch">
+          <button id="show-paper" aria-pressed="true">A4 人物简介</button
+          ><button id="show-graph" aria-pressed="false">可视化关系图</button>
+        </div>
+        <nav id="profile-navigation" aria-label="人物简介"></nav>
+        <p class="sidebar-label graph-layout-label">按布局查看示例</p>
         <nav id="layout-navigation" aria-label="示例布局"></nav>
         <div class="package-note">
-          <span class="package-version">v0.7.0 · MIT</span>
+          <span class="package-version">v0.8.0 · MIT</span>
           <p>同一套数据，多种排列方式。调整参数后直接复制代码。</p>
           <a id="download-package" download>下载组件包 .tgz</a>
         </div>
@@ -51,12 +57,17 @@
             <div class="preview-heading">
               <span id="example-count"></span>
               <div>
-                <button id="clear-selection">取消选中</button>
+                <button id="clear-selection">取消选中</button
+                ><button id="zoom-in-example" aria-label="放大图谱">＋</button
+                ><button id="zoom-out-example" aria-label="缩小图谱">−</button
+                ><button id="fit-example">适应画布</button>
               </div>
             </div>
             <label class="cross-group-toggle"
               ><input id="show-all-cross-relations" type="checkbox" />显示全部关系</label
             >
+            <button id="print-notebook">打印人物简介</button>
+            <div id="example-notebook"></div>
             <div id="example-graph" role="img" aria-label="人物关系图"></div>
             <div id="selection-detail" class="selection-detail" aria-live="polite"></div>
           </section>
@@ -74,6 +85,9 @@
                 <option value="3">完整关系 · 26 人</option>
               </select></label
             ><label class="field">中心人物<select id="example-core"></select></label>
+            <p class="paper-format-note">
+              A4 竖版 · 固定排版<br />左栏显示人物档案，右栏显示简介、经历和相关人物。关系较多时自动续页。
+            </p>
             <div id="appearance-controls"></div>
             <p class="parameter-note">选中人物只突出关系，不改变位置。数据和代码随参数同步更新。</p>
           </aside>
@@ -127,7 +141,7 @@
       <ol>
         <li>
           <a id="download-package-guide" download>下载组件包</a>，在自己的项目中安装：
-          <pre><code>npm install ./character-connections-0.7.0.tgz</code></pre>
+          <pre><code>npm install ./character-connections-0.8.0.tgz</code></pre>
         </li>
         <li>选择布局和参数，下载“示例数据”，保存为 <code>graph-data.json</code>。</li>
         <li>在“调用代码”中选择 TypeScript、HTML 自定义元素、React 或 Vue 3，复制代码。</li>

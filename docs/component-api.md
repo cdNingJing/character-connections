@@ -5,7 +5,7 @@
 先下载示例站中的 `.tgz` 包，或在源码运行 `npm run build`，再在自己的项目安装该文件。当前未发布 npm registry。`cytoscape` 会作为运行依赖安装，Vue、React 不属于依赖。
 
 ```bash
-npm install ./character-connections-0.7.0.tgz
+npm install ./character-connections-0.8.0.tgz
 ```
 
 始终导入 `character-connections/style.css`。样式仅作用于图谱容器与自定义元素，不包含示例站、工作台或全局页面样式。给容器设置明确高度，组件通过 ResizeObserver 响应尺寸变化。
@@ -55,3 +55,17 @@ document.querySelector('#app')!.append(graph);
 ## 本地验证
 
 `npm test` 验证布局、数据和代码生成。构建后运行 `npm run test:types` 验证对外类型声明。`npm run test:consumer` 在 4182 端口打开独立调用测试页，检查参数合并、错误更新回滚、位置保留、事件、销毁及自定义元素重新挂载。
+
+## A4 人物简介组件
+
+`createCharacterNotebook(host, { data, characterId, onSelectionChange })` 创建简历式人物简介。`characterId` 指定人物，默认使用数据中的 coreId 或第一个人物。左栏显示分组、属性、别名与标签，右栏显示简介、主要经历和相关人物。关系按原始方向显示，点击相关人物切换简介并派发选择回调。
+
+每页固定为 A4 比例（794 × 1123 CSS px），按容器宽度等比缩放。首张放 4 条关系，续页每张 7 条；页面整体正常滚动，纸张内部不拖动、不滚动。当前排版针对示例中的短简介与短属性设计；接入很长的自定义文本时需要自行控制内容长度。
+
+支持 `update({ data, characterId })`、`setSelection(selection)`、`fit()`、`exportData()`、`destroy()`。设置人物选择后切换简介，设置关系选择时保留当前人物。layout / appearance 参数保留兼容，空间布局和连线样式仅用于关系图组件。
+
+从 `character-connections/element` 导入 `registerCharacterNotebook()` 后可使用 `<character-notebook character-id="wukong">`。data 用 JS 属性赋值，characterId 属性与 character-id attribute 均可切换人物。组件派发 selection-change 事件，移除后自动清理。导入公共 style.css，容器只需有宽度，无需固定高度。
+
+示例站左侧切换“A4 人物简介”和“可视化关系图”，纸张视图提供人物列表，关系图提供布局列表。调用代码随视图及人物同步更新，支持 TypeScript、HTML 自定义元素、React 和 Vue 3。
+
+打印时宿主页面可设置 `@page { size: A4; margin: 0; }`。示例站“打印人物简介”只打印当前人物的纸张内容。

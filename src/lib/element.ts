@@ -101,3 +101,93 @@ declare global {
     'character-connections': CharacterConnectionsElement;
   }
 }
+
+import { createCharacterNotebook } from './notebook';
+import type { CharacterNotebook } from './notebook';
+export class CharacterNotebookElement extends ElementBase {
+  static observedAttributes = ['layout', 'character-id'];
+  get characterId(): string {
+    return this.getAttribute('character-id') ?? '';
+  }
+  set characterId(value: string) {
+    this.setAttribute('character-id', value);
+  }
+  private currentData?: GraphDocument;
+  private currentOptions: Partial<GraphOptions> = {};
+  private instance?: CharacterNotebook;
+  get data(): GraphDocument | undefined {
+    return this.currentData;
+  }
+  set data(value: GraphDocument) {
+    const parsed = parseGraphDocument(value);
+    this.instance?.update({ data: parsed });
+    this.currentData = parsed;
+    this.mountNotebook();
+  }
+  get options(): Partial<GraphOptions> {
+    return { ...this.currentOptions };
+  }
+  set options(value: Partial<GraphOptions>) {
+    const parsed = parseGraphOptions({ ...this.currentOptions, ...value });
+    this.instance?.update({ appearance: parsed });
+    this.currentOptions = parsed;
+  }
+  get layout(): LayoutName {
+    return (this.getAttribute('layout') ?? 'groups') as LayoutName;
+  }
+  set layout(value: LayoutName) {
+    if (!LAYOUT_NAMES.includes(value)) throw new Error('不支持的布局');
+    this.setAttribute('layout', value);
+  }
+  attributeChangedCallback(): void {
+    if (!LAYOUT_NAMES.includes(this.layout)) throw new Error('不支持的布局');
+    this.instance?.update({ layout: this.layout, characterId: this.characterId });
+  }
+  connectedCallback(): void {
+    for (const key of ['data', 'options', 'layout', 'characterId'] as const)
+      if (Object.prototype.hasOwnProperty.call(this, key)) {
+        const value = this[key];
+        Reflect.deleteProperty(this, key);
+        Reflect.set(this, key, value);
+      }
+    this.mountNotebook();
+  }
+  disconnectedCallback(): void {
+    queueMicrotask(() => {
+      if (this.isConnected) return;
+      this.instance?.destroy();
+      this.instance = undefined;
+    });
+  }
+  private mountNotebook(): void {
+    if (!this.isConnected || !this.currentData || this.instance) return;
+    this.instance = createCharacterNotebook(this, {
+      data: this.currentData,
+      appearance: this.currentOptions,
+      layout: this.layout,
+      characterId: this.characterId,
+      onSelectionChange: (selection) =>
+        this.dispatchEvent(
+          new CustomEvent('selection-change', { detail: selection, bubbles: true, composed: true }),
+        ),
+    });
+  }
+  fit(): void {
+    this.instance?.fit();
+  }
+  exportData(): GraphDocument | undefined {
+    return this.instance?.exportData() ?? this.currentData;
+  }
+}
+export function registerCharacterNotebook(): void {
+  if (!globalThis.customElements) throw new Error('请在浏览器中注册笔记组件');
+  const existing = customElements.get('character-notebook');
+  if (existing && existing !== CharacterNotebookElement)
+    throw new Error('character-notebook 已被其他组件注册');
+  if (!existing) customElements.define('character-notebook', CharacterNotebookElement);
+}
+declare global {
+  interface HTMLElementTagNameMap {
+    'character-notebook': CharacterNotebookElement;
+  }
+}

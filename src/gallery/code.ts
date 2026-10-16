@@ -1,7 +1,7 @@
 import { DEFAULT_OPTIONS } from '../lib/model.ts';
 import type { GraphOptions, LayoutName } from '../lib/model';
 export type IntegrationLanguage = 'typescript' | 'element' | 'react' | 'vue';
-export function createIntegrationCode(
+function createGraphIntegrationCode(
   layout: LayoutName,
   appearance: GraphOptions,
   language: IntegrationLanguage,
@@ -91,4 +91,40 @@ const chart = createCharacterGraph(host, {
 // chart.update({ layout: 'mindmap', appearance: { edgeShape: 'horizontal-taxi' } });
 // Call when unmounting the view:
 // chart.destroy();`;
+}
+
+export function createIntegrationCode(
+  layout: LayoutName,
+  appearance: GraphOptions,
+  language: IntegrationLanguage,
+  presentation: 'paper' | 'graph' = 'graph',
+  characterId = 'wukong',
+): string {
+  const paperAppearance = {
+    ...DEFAULT_OPTIONS,
+    crossGroupVisibility: appearance.crossGroupVisibility,
+  };
+  const source = createGraphIntegrationCode(
+    layout,
+    presentation === 'paper' ? paperAppearance : appearance,
+    language,
+  );
+  if (presentation === 'graph') return source;
+  return source
+    .replaceAll(
+      `layout: '${layout}',`,
+      `layout: '${layout}',\n  characterId: ${JSON.stringify(characterId)},`,
+    )
+    .replace(
+      'chart.layout =',
+      `chart.characterId = ${JSON.stringify(characterId)};\nchart.layout =`,
+    )
+    .replaceAll('createCharacterGraph', 'createCharacterNotebook')
+    .replaceAll('CharacterGraphComponent', 'CharacterNotebook')
+    .replaceAll('registerCharacterConnections', 'registerCharacterNotebook')
+    .replaceAll('character-connections layout', 'character-notebook layout')
+    .replaceAll("createElement('character-connections')", "createElement('character-notebook')")
+    .replaceAll('</character-connections>', '</character-notebook>')
+    .replaceAll('560px', 'auto')
+    .replace('height: 560', 'minHeight: 560');
 }

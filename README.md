@@ -99,10 +99,10 @@ npm run preview
 
 ## 接入自己的项目
 
-当前提供可安装的 `.tgz` 包，尚未发布到 npm registry。`npm run build` 同时生成示例站、类型声明、库和 `dist/character-connections-0.7.0.tgz`。
+当前提供可安装的 `.tgz` 包，尚未发布到 npm registry。`npm run build` 同时生成示例站、类型声明、库和 `dist/character-connections-0.8.0.tgz`。
 
 ```bash
-npm install ./character-connections-0.7.0.tgz
+npm install ./character-connections-0.8.0.tgz
 ```
 
 ```typescript
@@ -167,3 +167,9 @@ npm run build
 ### v0.7 跨组通道与局部展开
 
 分组示例默认只显示组内关系。点击人物展开他的跨组关系，其他人物和分组保持原位；取消选中即可收起。跨组连线采用组边出口和组间通道，“显示全部关系”开关可查看完整图谱。参数同步到组件调用代码与 JSON。
+
+### v0.8 A4 人物简介与关系图
+
+左侧切换“A4 人物简介”和“可视化关系图”。人物简介参考简历结构：左栏为档案、别名，右栏为简介、经历和相关人物；关系较多时自动续页。纸张保持 A4 比例，按屏幕宽度缩放，支持打印。关系图继续按布局分类，保留参数调整和跨组关系展开。
+
+通过 `createCharacterNotebook(host, { data, characterId: 'wukong' })` 或 `<character-notebook character-id="wukong">` 独立接入。示例数据、人物选择和调用代码同步，详见 [组件 API](docs/component-api.md)。

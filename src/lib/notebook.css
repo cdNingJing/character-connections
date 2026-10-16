@@ -1,0 +1,373 @@
+[data-character-notebook] {
+  width: 100%;
+  padding: 20px 0;
+  background: #e9eef0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+[data-character-notebook] * {
+  box-sizing: border-box;
+}
+[data-character-notebook] .notebook-page-slot {
+  position: relative;
+  margin: 0 auto 24px;
+}
+[data-character-notebook] .notebook-page-slot:last-child {
+  margin-bottom: 0;
+}
+[data-character-notebook] .notebook-sheet {
+  width: 794px;
+  height: 1123px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+  background: #fff;
+  box-shadow: 0 2px 12px #18374518;
+  color: #28414c;
+  padding: 44px 42px;
+  overflow: hidden;
+  font-family: 'Microsoft YaHei', sans-serif;
+}
+[data-character-notebook] .notebook-header {
+  height: 130px;
+  border-bottom: 2px solid #254f5d;
+}
+[data-character-notebook] .notebook-header > span {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #5d7b87;
+}
+[data-character-notebook] .notebook-header h2 {
+  font-family: SimSun, serif;
+  font-size: 28px;
+  margin: 16px 0 12px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-character-notebook] .notebook-header p {
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 0;
+  color: #6b7f88;
+}
+[data-character-notebook] .notebook-content {
+  padding-top: 20px;
+}
+[data-character-notebook] .notebook-group {
+  border: 1px solid #d7e4e4;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #f8fbfa;
+}
+[data-character-notebook] .notebook-group h3 {
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0 0 10px;
+  color: #3b6966;
+}
+[data-character-notebook] .notebook-group h3 small {
+  float: right;
+  font-size: 11px;
+  font-weight: 400;
+  color: #6c838c;
+}
+[data-character-notebook] .notebook-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+[data-character-notebook] .notebook-person {
+  position: relative;
+  height: 54px;
+  border: 1px solid #d9e3e6;
+  border-left: 3px solid var(--person-color);
+  border-radius: 4px;
+  background: #fff;
+  text-align: left;
+  padding: 7px 8px 5px 35px;
+  color: #294b58;
+  cursor: pointer;
+  min-width: 0;
+}
+[data-character-notebook] .notebook-person > small {
+  position: absolute;
+  left: 5px;
+  top: 10px;
+  font:
+    9px Consolas,
+    monospace;
+  color: #81949a;
+}
+[data-character-notebook] .notebook-person strong {
+  display: block;
+  font:
+    16px/20px SimSun,
+    serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-character-notebook] .notebook-person > span {
+  display: block;
+  font-size: 10px;
+  line-height: 16px;
+  color: #73888f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-character-notebook] .notebook-relation {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 190px 164px 190px;
+  column-gap: 16px;
+  height: 74px;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #e4ebed;
+  background: white;
+  padding: 4px 0 23px;
+  text-align: center;
+  align-items: center;
+  color: #2c4a56;
+  cursor: pointer;
+}
+[data-character-notebook] .notebook-relation-id {
+  font:
+    10px Consolas,
+    monospace;
+  color: #7b9199;
+}
+[data-character-notebook] .notebook-endpoint {
+  border: 1px solid #d9e4e7;
+  border-radius: 4px;
+  padding: 7px 5px;
+  font:
+    16px/20px SimSun,
+    serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-character-notebook] .notebook-endpoint small {
+  font:
+    9px Consolas,
+    monospace;
+  color: #81949a;
+  margin-right: 8px;
+}
+[data-character-notebook] .notebook-connector {
+  font-size: 11px;
+  color: #5b7e87;
+  overflow: hidden;
+}
+[data-character-notebook] .notebook-connector > span {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+[data-character-notebook] .notebook-connector i {
+  display: block;
+  font-style: normal;
+  line-height: 14px;
+  border-bottom: 1px solid #94adb4;
+}
+[data-character-notebook] .notebook-relation-note {
+  position: absolute;
+  bottom: 7px;
+  left: 50px;
+  right: 0;
+  text-align: left;
+  font-size: 10px;
+  color: #7f9097;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-character-notebook] .notebook-footer {
+  position: absolute;
+  bottom: 28px;
+  left: 42px;
+  right: 42px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #dce5e8;
+  padding-top: 12px;
+  font-size: 10px;
+  color: #78909a;
+}
+[data-character-notebook] .is-selected {
+  background: #e8f4ef;
+  border-color: #6a9e91;
+}
+[data-character-notebook] button:focus-visible {
+  outline: 2px solid #bd852a;
+  outline-offset: 2px;
+}
+
+@media print {
+  [data-character-notebook] {
+    padding: 0;
+    background: white;
+  }
+  [data-character-notebook] .notebook-page-slot {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0;
+    break-after: page;
+  }
+  [data-character-notebook] .notebook-sheet {
+    transform: none !important;
+    width: 210mm;
+    height: 297mm;
+    box-shadow: none;
+  }
+}
+
+character-notebook {
+  display: block;
+}
+
+@media print {
+  [data-character-notebook] {
+    overflow: visible;
+  }
+  [data-character-notebook] .notebook-page-slot:last-child {
+    break-after: auto;
+  }
+}
+[data-character-notebook] .notebook-group h3 {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-character-notebook] .profile-sheet {
+  padding: 48px 46px;
+}
+[data-character-notebook] .profile-header {
+  border-bottom: 3px solid #254f5d;
+  padding-bottom: 25px;
+}
+[data-character-notebook] .profile-header > span {
+  font: 12px sans-serif;
+  letter-spacing: 2px;
+  color: #6b7f88;
+}
+[data-character-notebook] .profile-header h2 {
+  font:
+    bold 48px SimSun,
+    serif;
+  margin: 18px 0 12px;
+  letter-spacing: 6px;
+}
+[data-character-notebook] .profile-header p {
+  margin: 0;
+  font-size: 15px;
+  color: #52776d;
+}
+[data-character-notebook] .profile-columns {
+  display: grid;
+  grid-template-columns: 192px minmax(0, 1fr);
+  gap: 32px;
+  padding-top: 28px;
+}
+[data-character-notebook] .profile-sidebar {
+  border-right: 1px solid #dce5e5;
+  padding-right: 24px;
+}
+[data-character-notebook] .profile-monogram {
+  width: 94px;
+  height: 94px;
+  background: #edf3f0;
+  color: #38695e;
+  display: grid;
+  place-items: center;
+  font:
+    50px SimSun,
+    serif;
+  margin-bottom: 30px;
+}
+[data-character-notebook] .profile-sheet h3 {
+  font: 600 14px sans-serif;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #dce5e5;
+  padding-bottom: 10px;
+  margin: 0 0 14px;
+}
+[data-character-notebook] .profile-sheet h3 small {
+  font: 11px sans-serif;
+  color: #71848a;
+  letter-spacing: 0;
+  margin-left: 8px;
+}
+[data-character-notebook] .profile-sidebar dl {
+  margin: 0 0 26px;
+}
+[data-character-notebook] .profile-sidebar dt {
+  color: #75888d;
+  font: 11px sans-serif;
+  margin-top: 16px;
+}
+[data-character-notebook] .profile-sidebar dd {
+  margin: 6px 0 0;
+  font:
+    15px/1.7 SimSun,
+    serif;
+  overflow-wrap: anywhere;
+}
+[data-character-notebook] .profile-sidebar ul {
+  padding-left: 18px;
+  font:
+    15px/2 SimSun,
+    serif;
+}
+[data-character-notebook] .profile-main section {
+  margin-bottom: 26px;
+}
+[data-character-notebook] .profile-intro {
+  font:
+    17px/1.9 SimSun,
+    serif;
+  margin: 0;
+}
+[data-character-notebook] .profile-experiences {
+  margin: 0;
+  padding-left: 22px;
+  font:
+    16px/2 SimSun,
+    serif;
+}
+[data-character-notebook] .profile-relation {
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0f0;
+}
+[data-character-notebook] .profile-relation button {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #305c53;
+  font:
+    bold 17px SimSun,
+    serif;
+  cursor: pointer;
+  text-align: left;
+}
+[data-character-notebook] .profile-relation > span {
+  display: block;
+  font: 12px/1.6 sans-serif;
+  color: #668079;
+  margin-top: 5px;
+}
+[data-character-notebook] .profile-relation p {
+  font:
+    14px/1.6 SimSun,
+    serif;
+  margin: 4px 0 0;
+}

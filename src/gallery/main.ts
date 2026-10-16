@@ -1,11 +1,17 @@
 import './styles.css';
 import {
   createCharacterGraph,
+  createCharacterNotebook,
   DEFAULT_OPTIONS,
   parseGraphDocument,
   parseGraphOptions,
 } from '../lib/index';
-import type { CharacterGraphComponent, GraphOptions, GraphDocument } from '../lib/index';
+import type {
+  CharacterGraphComponent,
+  CharacterNotebook,
+  GraphOptions,
+  GraphDocument,
+} from '../lib/index';
 import type { Selection } from '../lib/character-graph';
 import { createJourneyDocument } from '../data/journey';
 import { LAYOUT_EXAMPLES } from './examples';
@@ -26,6 +32,9 @@ let example = LAYOUT_EXAMPLES.find((item) => item.id === 'groups')!;
 let data: GraphDocument = createJourneyDocument(example.stage);
 let appearance: GraphOptions = parseGraphOptions({ ...DEFAULT_OPTIONS, ...example.appearance });
 let chart: CharacterGraphComponent;
+let notebook: CharacterNotebook | undefined;
+let paperMode = true;
+let profileId = 'wukong';
 let activeTab: 'code' | 'data' = 'code';
 let notificationTimer: ReturnType<typeof setTimeout>;
 function notify(message: string): void {
@@ -244,13 +253,47 @@ function syncAllControls(): void {
     curved || appearance.edgeShape === 'straight';
 }
 function syncAllSourcePanels(updateData = true): void {
+  refreshProfileNavigation();
   const language = element<HTMLSelectElement>('integration-language').value as IntegrationLanguage;
-  element('example-code').textContent = createIntegrationCode(example.id, appearance, language);
+  element('example-code').textContent = createIntegrationCode(
+    example.id,
+    appearance,
+    language,
+    paperMode ? 'paper' : 'graph',
+    profileId,
+  );
+  if (notebook) notebook.update({ data, layout: example.id, appearance, characterId: profileId });
+  else
+    notebook = createCharacterNotebook(element('example-notebook'), {
+      data,
+      layout: example.id,
+      characterId: profileId,
+      appearance,
+      onSelectionChange: (selection) => {
+        if (selection?.kind === 'character') chart.graph.selectCharacterById(selection.id);
+        else if (selection) chart.graph.selectRelationById(selection.id);
+        else chart.graph.clearSelection();
+      },
+    });
+  notebook.setSelection(paperMode ? { kind: 'character', id: profileId } : chart.graph.selection);
+  refreshProfileNavigation();
   if (updateData)
     element<HTMLTextAreaElement>('example-data').value = JSON.stringify(data, null, 2);
   element('data-error').textContent = '';
 }
 function renderSelection(selection: Selection): void {
+  if (paperMode && selection?.kind === 'character') {
+    profileId = selection.id;
+    refreshProfileNavigation();
+    element('example-code').textContent = createIntegrationCode(
+      example.id,
+      appearance,
+      element<HTMLSelectElement>('integration-language').value as IntegrationLanguage,
+      'paper',
+      profileId,
+    );
+  }
+  notebook?.setSelection(paperMode ? { kind: 'character', id: profileId } : selection);
   const panel = element('selection-detail');
   if (!selection) {
     panel.textContent = '点击人物查看相关关系，点击连线查看关系说明。其他人物始终保留。';
@@ -301,6 +344,7 @@ function loadExampleByHash(): void {
   refreshDataSummary();
   syncAllControls();
   syncAllSourcePanels();
+  refreshViewHeading();
 }
 element('appearance-controls').addEventListener('input', (event) => {
   const field = event.target as HTMLInputElement | HTMLSelectElement;
@@ -340,6 +384,8 @@ element('integration-language').addEventListener('change', () => {
     example.id,
     appearance,
     element<HTMLSelectElement>('integration-language').value as IntegrationLanguage,
+    paperMode ? 'paper' : 'graph',
+    profileId,
   );
 });
 function selectSourceTab(tab: 'code' | 'data'): void {
@@ -416,12 +462,15 @@ element('close-guide').addEventListener('click', () =>
   element<HTMLDialogElement>('integration-guide').close(),
 );
 element<HTMLAnchorElement>('download-package').href = import.meta.env.DEV
-  ? './dist/character-connections-0.7.0.tgz'
-  : './character-connections-0.7.0.tgz';
+  ? './dist/character-connections-0.8.0.tgz'
+  : './character-connections-0.8.0.tgz';
 selectSourceTab('code');
 loadExampleByHash();
 window.addEventListener('pagehide', (event) => {
-  if (!event.persisted) chart.destroy();
+  if (!event.persisted) {
+    chart.destroy();
+    notebook?.destroy();
+  }
 });
 
 element<HTMLAnchorElement>('download-package-guide').href =
@@ -452,3 +501,54 @@ element('show-all-cross-relations').addEventListener('change', () => {
   syncAllControls();
   syncAllSourcePanels(false);
 });
+
+function setPaperMode(enabled: boolean): void {
+  paperMode = enabled;
+  element('example-notebook').hidden = !enabled;
+  element('example-graph').style.display = enabled ? 'none' : 'block';
+  element('show-paper').setAttribute('aria-pressed', String(enabled));
+  element('show-graph').setAttribute('aria-pressed', String(!enabled));
+  document.body.dataset.paperMode = String(enabled);
+  element('print-notebook').hidden = !enabled;
+  element('layout-navigation').hidden = enabled;
+  element('profile-navigation').hidden = !enabled;
+  refreshViewHeading();
+  if (enabled) notebook?.fit();
+  else chart.fit();
+  syncAllSourcePanels(false);
+}
+function refreshViewHeading(): void {
+  const person = data.characters.find((item) => item.id === profileId) ?? data.characters[0];
+  element('example-title').textContent = paperMode ? `${person.name} · 人物简介` : example.title;
+  element('example-description').textContent = paperMode
+    ? '按简历结构整理人物资料，点击左侧姓名切换人物。'
+    : example.description;
+  element('layout-explanation').textContent = paperMode
+    ? 'A4 竖版：人物档案、简介、经历与相关人物分栏排版。'
+    : example.rule;
+  document.title = `${paperMode ? person.name + ' · 人物简介' : example.title} · 人物关联线`;
+}
+function refreshProfileNavigation(): void {
+  if (!data.characters.some((item) => item.id === profileId))
+    profileId = data.coreId ?? data.characters[0].id;
+  element('profile-navigation').innerHTML =
+    `<section class="nav-group"><h2>选择人物</h2>${data.characters
+      .map(
+        (person) =>
+          `<button data-profile-id="${escapeHtml(person.id)}" aria-current="${person.id === profileId ? 'page' : 'false'}">${escapeHtml(person.name)}<small>${escapeHtml(person.group)}</small></button>`,
+      )
+      .join('')}</section>`;
+  refreshViewHeading();
+}
+element('profile-navigation').addEventListener('click', (event) => {
+  const button = (event.target as Element).closest<HTMLElement>('[data-profile-id]');
+  if (!button) return;
+  profileId = button.dataset.profileId!;
+  chart.graph.selectCharacterById(profileId);
+  syncAllSourcePanels(false);
+});
+
+element('show-paper').addEventListener('click', () => setPaperMode(true));
+element('show-graph').addEventListener('click', () => setPaperMode(false));
+element('print-notebook').addEventListener('click', () => window.print());
+setPaperMode(true);

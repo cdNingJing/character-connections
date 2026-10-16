@@ -27,3 +27,6 @@ export { LAYOUT_NAMES } from './model';
 
 export type { CharacterGroup } from './model';
 export { getAllGroupRegions } from './group-regions';
+
+export { CharacterNotebook, createCharacterNotebook } from './notebook';
+export type { CharacterNotebookProps } from './notebook';

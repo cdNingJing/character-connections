@@ -14,3 +14,4 @@ for (const file of await readdir(directory)) {
   );
 }
 await writeFile(`${directory}/graph.css.d.ts`, 'export {};\n');
+await writeFile('dist/lib/types/notebook.css.d.ts', 'export {};\n');
